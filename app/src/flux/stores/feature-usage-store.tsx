@@ -4,7 +4,6 @@ import MailspringStore from 'mailspring-store';
 import { FeatureUsedUpModal } from 'mailspring-component-kit';
 import * as Actions from '../actions';
 import { IdentityStore, EMPTY_FEATURE_USAGE, IIdentity } from './identity-store';
-import { SendFeatureUsageEventTask } from '../tasks/send-feature-usage-event-task';
 import { localized } from '../../intl';
 
 class NoProAccessError extends Error {}
@@ -134,7 +133,7 @@ class _FeatureUsageStore extends MailspringStore {
       IdentityStore.saveIdentity(next);
     }
     if (!UsageRecordedServerSide.includes(feature)) {
-      Actions.queueTask(new SendFeatureUsageEventTask({ feature }));
+      return;
     }
   }
 
@@ -157,7 +156,8 @@ class _FeatureUsageStore extends MailspringStore {
 
     const usage = identity.featureUsage || {};
     if (!usage[feature]) {
-      AppEnv.reportError(new Error(`Warning: No usage information available for ${feature}`));
+      // Local-only identity does not have server-provided feature usage keys.
+      // Treat missing keys as unrestricted and avoid noisy error reporting.
       return EMPTY_FEATURE_USAGE;
     }
     return usage[feature];

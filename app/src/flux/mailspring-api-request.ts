@@ -29,10 +29,15 @@ export const CanceledErrorCodes = [-123, 'ECONNABORTED'];
 export const SampleTemporaryErrorCode = 504;
 
 let IdentityStore = null;
+const LOCAL_ONLY_MODE = true;
 
 // server option
 
 export function rootURLForServer(server: 'identity') {
+  if (LOCAL_ONLY_MODE && server === 'identity') {
+    return 'http://127.0.0.1:9';
+  }
+
   const env = AppEnv.config.get('env');
 
   if (!['development', 'staging', 'production'].includes(env)) {
@@ -101,6 +106,13 @@ export async function makeRequest({
   // In case the request failsm capture the stack now.
   const root = rootURLForServer(server);
   const url = `${root}${path}`;
+  const desc = `${rest.method || 'GET'} ${url}`;
+
+  if (LOCAL_ONLY_MODE) {
+    const blockedError = new APIError(`${desc} blocked in local-only mode`);
+    blockedError.statusCode = 0;
+    throw blockedError;
+  }
 
   IdentityStore = IdentityStore || require('./stores/identity-store').IdentityStore;
   const identity = IdentityStore.identity();
@@ -123,7 +135,6 @@ export async function makeRequest({
     }
   }
 
-  const desc = `${init.method || 'GET'} ${url}`;
   const error = new APIError(`${desc} failed`);
   let resp = null;
   try {

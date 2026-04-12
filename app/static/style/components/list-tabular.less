@@ -90,7 +90,8 @@ body.platform-win32 {
   .list-rows {
     // Note: This fills empty / unrendered space with the dividers.
     // background-size needs to be provided.
-    background: linear-gradient(to top, @list-border 0px, @list-bg 1px) repeat;
+    background: @list-bg;
+    border-bottom: 1px solid @list-border;
   }
 
   .list-rows > div {

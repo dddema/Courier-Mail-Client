@@ -1,6 +1,5 @@
 import { Utils, KeyManager } from 'mailspring-exports';
 import { IdentityStore } from '../../src/flux/stores/identity-store';
-import * as MailspringAPIRequest from '../../src/flux/mailspring-api-request';
 
 const TEST_NYLAS_ID = 'icihsnqh4pwujyqihlrj70vh';
 
@@ -33,11 +32,11 @@ describe('IdentityStore', function identityStoreSpec() {
 
     it('clears passwords if unsetting', async () => {
       await IdentityStore.saveIdentity(null);
-      expect(KeyManager.deletePassword).toHaveBeenCalled();
+      expect(KeyManager.deletePassword).not.toHaveBeenCalled();
       expect(KeyManager.replacePassword).not.toHaveBeenCalled();
       expect(AppEnv.config.set).toHaveBeenCalled();
       const ident = (AppEnv.config.set as jasmine.Spy).calls[0].args[1];
-      expect(ident).toBe(null);
+      expect(ident.id).toEqual('local-only-identity');
     });
 
     it('applies changes synchronously', async () => {
@@ -77,32 +76,21 @@ describe('IdentityStore', function identityStoreSpec() {
       IdentityStore._identity = this.identityJSON;
       spyOn(IdentityStore, 'saveIdentity');
       spyOn(AppEnv, 'reportError');
-      spyOn(console, 'error');
     });
 
-    it('saves the identity returned', async () => {
-      const resp = Utils.deepClone(this.identityJSON);
-      resp.featureUsage.feat.quota = 5;
-      spyOn(MailspringAPIRequest, 'makeRequest').andCallFake(() => {
-        return Promise.resolve(resp);
-      });
+    it('returns the local identity when already initialized', async () => {
       await IdentityStore.fetchIdentity();
-      expect(MailspringAPIRequest.makeRequest).toHaveBeenCalled();
-      const options = (MailspringAPIRequest.makeRequest as jasmine.Spy).calls[0].args[0];
-      expect(options.path).toEqual('/api/me');
-      expect(IdentityStore.saveIdentity).toHaveBeenCalled();
-      const newIdent = (IdentityStore.saveIdentity as jasmine.Spy).calls[0].args[0];
-      expect(newIdent.featureUsage.feat.quota).toBe(5);
+      expect(IdentityStore.saveIdentity).not.toHaveBeenCalled();
       expect(AppEnv.reportError).not.toHaveBeenCalled();
     });
 
-    it('errors if the json is invalid', async () => {
-      spyOn(MailspringAPIRequest, 'makeRequest').andCallFake(() => {
-        return Promise.resolve({});
-      });
+    it('initializes the local identity if it is missing', async () => {
+      IdentityStore._identity = null;
       await IdentityStore.fetchIdentity();
-      expect(AppEnv.reportError).toHaveBeenCalled();
-      expect(IdentityStore.saveIdentity).not.toHaveBeenCalled();
+      expect(IdentityStore.saveIdentity).toHaveBeenCalled();
+      const newIdent = (IdentityStore.saveIdentity as jasmine.Spy).calls[0].args[0];
+      expect(newIdent.id).toEqual('local-only-identity');
+      expect(AppEnv.reportError).not.toHaveBeenCalled();
     });
   });
 });

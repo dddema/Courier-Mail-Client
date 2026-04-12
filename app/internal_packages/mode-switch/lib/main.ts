@@ -19,18 +19,21 @@ class ToggleWithTutorialTipList extends ToggleWithTutorialTip {
 }
 
 export function activate() {
-  ComponentRegistry.register(ToggleWithTutorialTipList, {
-    location: WorkspaceStore.Sheet.Thread.Toolbar.Right,
-    modes: ['list'],
-  });
+  // ComponentRegistry.register(ToggleWithTutorialTipList, {
+  //   location: WorkspaceStore.Sheet.Thread.Toolbar.Right,
+  //   modes: ['list'],
+  // });
 
-  ComponentRegistry.register(ToggleWithTutorialTip, {
-    location: WorkspaceStore.Sheet.Threads.Toolbar.Right,
-    modes: ['split', 'splitVertical'],
-  });
+  // ComponentRegistry.register(ToggleWithTutorialTip, {
+  //   location: WorkspaceStore.Sheet.Threads.Toolbar.Right,
+  //   modes: ['split', 'splitVertical'],
+  // });
+  deactivate();
+  // INTENTIONALLY DISABLED
 }
 
 export function deactivate() {
   ComponentRegistry.unregister(ToggleWithTutorialTip);
   ComponentRegistry.unregister(ToggleWithTutorialTipList);
+  // does nothing as its disabled
 }

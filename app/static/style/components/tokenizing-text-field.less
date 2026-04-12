@@ -88,7 +88,7 @@
     max-width: 100%;
     line-height: 1.9em;
 
-    background: linear-gradient(to bottom, @token-top 0%, @token-bottom 100%);
+    background: @token-top;
     box-shadow: @base-box-shadow;
     vertical-align: middle;
 
@@ -106,7 +106,7 @@
       font-size: 10px;
     }
     &:hover {
-      background: linear-gradient(to bottom, @token-hover-top 0%, @token-hover-bottom 100%);
+      background: @token-hover-top;
       box-shadow: 0 0.5px 0 darken(@token-hover-bottom, 35%),
         0 -0.5px 0 darken(@token-hover-top, 25%), 0.5px 0 0 darken(@token-hover-bottom, 25%),
         -0.5px 0 0 darken(@token-hover-bottom, 25%), 0 1px 1px rgba(0, 0, 0, 0.07);
@@ -123,11 +123,7 @@
     }
     &.invalid.selected,
     &.invalid.dragging {
-      background: linear-gradient(
-        to bottom,
-        @token-invalid-selected-top 0%,
-        @token-invalid-selected-bottom 100%
-      );
+      background: @token-invalid-selected-top;
       box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.1);
       border: 1px solid darken(@token-invalid-selected-bottom, 8%);
       border-top: 1px solid darken(@token-invalid-selected-top, 10%);
@@ -135,7 +131,7 @@
 
     &.selected,
     &.dragging {
-      background: linear-gradient(to bottom, @token-selected-top 0%, @token-selected-bottom 100%);
+      background: @token-selected-top;
       box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.3), 0 1px 1px rgba(0, 0, 0, 0.1);
       border: 1px solid darken(@token-selected-bottom, 8%);
       border-top: 1px solid darken(@token-selected-top, 10%);

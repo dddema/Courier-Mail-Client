@@ -32,9 +32,6 @@ export const LabelColorizer = {
       backgroundColor: LabelColorizer.backgroundColor(label),
       boxShadow: `inset 0 0 1px hsl(${label.hue()}, 62%, 47%), inset 0 1px 1px rgba(255,255,255,0.5), 0 0.5px 0 rgba(255,255,255,0.5)`,
     };
-    if (process.platform !== 'win32') {
-      styles.backgroundImage = 'linear-gradient(rgba(255,255,255, 0.4), rgba(255,255,255,0))';
-    }
     return styles;
   },
 };

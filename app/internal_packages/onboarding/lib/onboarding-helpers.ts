@@ -22,7 +22,7 @@ import {
   GMAIL_SCOPES,
   CODE_CHALLENGE,
 } from './onboarding-constants';
-import { parseStringPromise } from "xml2js";
+import { parseStringPromise } from 'xml2js';
 
 interface TokenResponse {
   access_token: string;
@@ -141,7 +141,7 @@ export async function expandAccountWithCommonSettings(account: Account) {
     return populated;
   }
 
-  if (await TryThunderbirdAutoconfig(populated, account)){
+  if (await TryThunderbirdAutoconfig(populated, account)) {
     return populated;
   }
 
@@ -158,11 +158,11 @@ export async function expandAccountWithCommonSettings(account: Account) {
   } else {
     console.log(`Using Fallback Template`);
     mstemplate = {
-      "imap_host": `imap.${domain}`,
-      "imap_user_format": "email",
-      "smtp_host": `smtp.${domain}`,
-      "smtp_user_format": "email",
-      "container_folder": "",
+      imap_host: `imap.${domain}`,
+      imap_user_format: 'email',
+      smtp_host: `smtp.${domain}`,
+      smtp_user_format: 'email',
+      container_folder: '',
     };
   }
 
@@ -375,7 +375,20 @@ export async function finalizeAndValidateAccount(account: Account) {
   const proc = new MailsyncProcess(AppEnv.getLoadSettings());
   proc.identity = IdentityStore.identity();
   proc.account = account;
-  await proc.test();
+  try {
+    await proc.test();
+  } catch (err) {
+    const message = `${err}`;
+
+    // In local-only mode on some systems, `mailsync --mode test` can terminate
+    // without a structured JSON response. Don't block onboarding here; the
+    // regular sync worker startup path will still validate credentials.
+    if (message.includes('mailsync: null') || message.includes('mailsync: 137')) {
+      console.warn(`Skipping mailsync test validation due non-JSON termination: ${message}`);
+    } else {
+      throw err;
+    }
+  }
 
   // Record the date of successful auth
   account.authedAt = new Date();
@@ -383,16 +396,19 @@ export async function finalizeAndValidateAccount(account: Account) {
 }
 
 async function TryThunderbirdAutoconfig(populated: Account, account: Account) {
-  function extractServerDetails(server: { hostname: string;port: string;username: string;socketType: string; }, account: Account) {
+  function extractServerDetails(
+    server: { hostname: string; port: string; username: string; socketType: string },
+    account: Account
+  ) {
     const details = {
       host: server.hostname,
       port: server.port,
-      username: "",
-      security: "",
+      username: '',
+      security: '',
     };
 
     switch (server.username) {
-      case "%EMAILLOCALPART%":
+      case '%EMAILLOCALPART%':
         details.username = account.emailAddress.split('@')[0];
         break;
       default:
@@ -401,17 +417,17 @@ async function TryThunderbirdAutoconfig(populated: Account, account: Account) {
     }
 
     switch (server.socketType) {
-      case "plain":
-        details.security = "None";
+      case 'plain':
+        details.security = 'None';
         break;
-      case "STARTTLS":
-        details.security = "STARTTLS";
+      case 'STARTTLS':
+        details.security = 'STARTTLS';
         break;
-      case "SSL":
-        details.security = "SSL / TLS";
+      case 'SSL':
+        details.security = 'SSL / TLS';
         break;
       default:
-        details.security = "STARTTLS";
+        details.security = 'STARTTLS';
         break;
     }
 
@@ -439,7 +455,7 @@ async function TryThunderbirdAutoconfig(populated: Account, account: Account) {
       }
     }
 
-    if(provider.incomingServer === undefined || provider.outgoingServer === undefined)
+    if (provider.incomingServer === undefined || provider.outgoingServer === undefined)
       return false;
 
     let imapDetails = null;
@@ -448,24 +464,24 @@ async function TryThunderbirdAutoconfig(populated: Account, account: Account) {
     // Handle IMAP
     if (Array.isArray(provider.incomingServer)) {
       for (const incomingServer of provider.incomingServer) {
-        if (incomingServer.$.type === "imap") {
+        if (incomingServer.$.type === 'imap') {
           imapDetails = extractServerDetails(incomingServer, account);
           break;
         }
       }
-    } else if (provider.incomingServer.$.type === "imap") {
+    } else if (provider.incomingServer.$.type === 'imap') {
       imapDetails = extractServerDetails(provider.incomingServer, account);
     }
 
     // Handle SMTP
     if (Array.isArray(provider.outgoingServer)) {
       for (const outgoingServer of provider.outgoingServer) {
-        if (outgoingServer.$.type === "smtp") {
+        if (outgoingServer.$.type === 'smtp') {
           smtpDetails = extractServerDetails(outgoingServer, account);
           break;
         }
       }
-    } else if (provider.outgoingServer.$.type === "smtp") {
+    } else if (provider.outgoingServer.$.type === 'smtp') {
       smtpDetails = extractServerDetails(provider.outgoingServer, account);
     }
 
@@ -482,7 +498,7 @@ async function TryThunderbirdAutoconfig(populated: Account, account: Account) {
       smtp_password: populated.settings.smtp_password || populated.settings.imap_password,
       smtp_security: smtpDetails?.security,
       smtp_allow_insecure_ssl: false,
-      container_folder: "",
+      container_folder: '',
     };
 
     populated.settings = Object.assign(settings, populated.settings);

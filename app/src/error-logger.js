@@ -26,7 +26,7 @@ var RavenErrorReporter = require('./error-logger-extensions/raven-error-reporter
 //
 // The errorLogger will report errors to a log file as well as to 3rd
 // party reporting services if enabled.
-module.exports = ErrorLogger = (function () {
+module.exports = ErrorLogger = (function() {
   function ErrorLogger(args) {
     this.reportError = this.reportError.bind(this);
     this.inSpecMode = args.inSpecMode;
@@ -56,7 +56,7 @@ module.exports = ErrorLogger = (function () {
   /////////////////////////// PUBLIC METHODS //////////////////////////
   /////////////////////////////////////////////////////////////////////
 
-  ErrorLogger.prototype.reportError = function (error, extra = {}) {
+  ErrorLogger.prototype.reportError = function(error, extra = {}) {
     if (this.inSpecMode) {
       return;
     }
@@ -103,36 +103,23 @@ module.exports = ErrorLogger = (function () {
   ////////////////////////// PRIVATE METHODS //////////////////////////
   /////////////////////////////////////////////////////////////////////
 
-  ErrorLogger.prototype._startCrashReporter = function (args) {
-    if (process.type === 'renderer') {
-      return;
-    }
-    require('electron').crashReporter.start({
-      productName: 'Mailspring',
-      companyName: 'Mailspring',
-      submitURL: `https://id.getmailspring.com/report-crash?ver=${appVersion}&platform=${process.platform}`,
-      uploadToServer: true,
-      autoSubmit: true,
-      extra: {
-        ver: appVersion,
-        platform: process.platform,
-      },
-    })
+  ErrorLogger.prototype._startCrashReporter = function(args) {
+    return;
   };
 
-  ErrorLogger.prototype._extendNativeConsole = function (args) {
+  ErrorLogger.prototype._extendNativeConsole = function(args) {
     console.debug = this._consoleDebug.bind(this);
   };
 
   // globally define Error.toJSON. This allows us to pass errors via IPC
   // and through the Action Bridge. Note:they are not re-inflated into
   // Error objects automatically.
-  ErrorLogger.prototype._extendErrorObject = function (args) {
+  ErrorLogger.prototype._extendErrorObject = function(args) {
     Object.defineProperty(Error.prototype, 'toJSON', {
-      value: function () {
+      value: function() {
         var alt = {};
 
-        Object.getOwnPropertyNames(this).forEach(function (key) {
+        Object.getOwnPropertyNames(this).forEach(function(key) {
           alt[key] = this[key];
         }, this);
 
@@ -142,7 +129,7 @@ module.exports = ErrorLogger = (function () {
     });
   };
 
-  ErrorLogger.prototype._notifyExtensions = function () {
+  ErrorLogger.prototype._notifyExtensions = function() {
     var command, args;
     command = arguments[0];
     args = 2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
@@ -156,7 +143,7 @@ module.exports = ErrorLogger = (function () {
   // or `false`, don't print in console as the first parameter.
   // This makes it easy for developers to turn on and off
   // "verbose console" mode.
-  ErrorLogger.prototype._consoleDebug = function () {
+  ErrorLogger.prototype._consoleDebug = function() {
     var args = [];
     var showIt = arguments[0];
     for (var ii = 1; ii < arguments.length; ii++) {

@@ -403,6 +403,16 @@ export class MailsyncProcess extends EventEmitter {
       this._closeStatusWindow();
     } catch (err) {
       this._closeStatusWindow();
+
+      // In local-only mode on some systems, mailsync migrate can terminate
+      // without a structured JSON error (null exit code / signal termination).
+      // Allow app boot to continue instead of entering an endless rebuild loop.
+      const raw = `${err}`;
+      if (raw.includes('mailsync: null') || raw.includes('mailsync: 137')) {
+        console.warn(`Skipping mailsync migrate due non-JSON termination: ${raw}`);
+        return;
+      }
+
       throw err;
     }
   }

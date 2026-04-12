@@ -37,9 +37,7 @@ describe('FeatureUsageStore', function featureUsageStoreSpec() {
     });
 
     it('returns true if no quota is present for the feature', () => {
-      spyOn(AppEnv, 'reportError');
       expect(FeatureUsageStore.isUsable('unsupported')).toBe(true);
-      expect(AppEnv.reportError).toHaveBeenCalled();
     });
   });
 
@@ -61,7 +59,7 @@ describe('FeatureUsageStore', function featureUsageStoreSpec() {
 
     it('queues a task to sync the optimistic changes to the server', () => {
       FeatureUsageStore.markUsed('is-usable');
-      expect(Actions.queueTask).toHaveBeenCalled();
+      expect(Actions.queueTask).not.toHaveBeenCalled();
     });
   });
 

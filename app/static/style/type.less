@@ -27,23 +27,29 @@ h6 {
 h1 {
   font-size: @font-size-h1;
   font-weight: @font-weight-semi-bold;
+  letter-spacing: -0.3px;
 }
 h2 {
   font-size: @font-size-h2;
-  font-weight: @font-weight-blond;
+  font-weight: @font-weight-medium;
+  letter-spacing: -0.2px;
 }
 h3 {
   font-size: @font-size-h3;
-  font-weight: @font-weight-blond;
+  font-weight: @font-weight-medium;
+  letter-spacing: -0.1px;
 }
 h4 {
   font-size: @font-size-h4;
+  font-weight: @font-weight-medium;
 }
 h5 {
   font-size: @font-size-h5;
+  font-weight: @font-weight-medium;
 }
 h6 {
   font-size: @font-size-h6;
+  font-weight: @font-weight-medium;
 }
 
 h1,
@@ -74,16 +80,21 @@ h6 {
 
 a {
   color: @text-color-link;
-}
-a:hover {
-  color: @text-color-link;
-  cursor: default;
-}
-a:active {
-  color: @text-color-link-active;
-}
-a:visisted {
-  color: @text-color-link-active;
+  text-decoration: none;
+  transition: color 0.15s ease-in-out;
+
+  &:hover {
+    color: @text-color-link-hover;
+    cursor: default;
+  }
+
+  &:active {
+    color: @text-color-link-active;
+  }
+
+  &:visited {
+    color: @text-color-link-active;
+  }
 }
 
 p {

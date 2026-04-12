@@ -23,9 +23,6 @@ mailspring-workspace {
   overflow: hidden;
   position: relative;
   font-family: @font-family;
-
-  // Important: This attribute is used in the theme-manager-specs to check that
-  // themes load and override each other correctly. Do not remove!
   background-color: @background-primary;
 }
 
@@ -38,9 +35,9 @@ mailspring-workspace {
 }
 
 .sheet-stack-enter {
-  left: 30px;
+  left: 20px;
   opacity: 0;
-  transition: all 0.125s ease-out;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .sheet-stack-enter.sheet-stack-enter-active {
@@ -51,11 +48,11 @@ mailspring-workspace {
 .sheet-stack-leave {
   left: 0;
   opacity: 1;
-  transition: all 0.125s ease-in;
+  transition: all 0.12s ease-in;
 }
 
 .sheet-stack-leave.sheet-stack-leave-active {
-  left: 30px;
+  left: 20px;
   opacity: 0;
 }
 
@@ -136,11 +133,7 @@ body.is-blurred {
     }
   }
   .sheet-toolbar-container {
-    background-image: linear-gradient(
-      to bottom,
-      lighten(@toolbar-background-color, 14%),
-      lighten(@toolbar-background-color, 14%)
-    );
+    background-color: @toolbar-background-color;
 
     .btn.btn-toolbar {
       background: none;
@@ -159,12 +152,7 @@ body.is-blurred {
 }
 
 .sheet-toolbar-container {
-  background-image: -webkit-linear-gradient(
-    lighten(@toolbar-background-color, 10%) 0%,
-    lighten(@toolbar-background-color, 10%) 1.9%,
-    lighten(@toolbar-background-color, 9%) 2%,
-    @toolbar-background-color 100%
-  );
+  background-color: @toolbar-background-color;
   color: @text-color-heading;
 }
 
@@ -516,6 +504,12 @@ body.platform-win32 {
         box-shadow: none;
       }
     }
+  }
+}
+
+body.window-type-default {
+  .sheet-toolbar .item-compose {
+    display: none;
   }
 }
 

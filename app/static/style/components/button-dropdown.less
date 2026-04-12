@@ -53,6 +53,25 @@
     cursor: default;
     color: @btn-default-text-color;
   }
+
+  &.bordered {
+    .primary-item,
+    .secondary-picker,
+    .only-item {
+      border: 1px solid @border-color-primary;
+      background: @background-primary;
+      box-shadow: none;
+    }
+
+    .primary-item {
+      border-right: 0;
+    }
+
+    .secondary-picker {
+      border-left: 1px solid @border-color-secondary;
+    }
+  }
+
   .primary-item {
     border-radius: @border-radius-base 0 0 @border-radius-base;
   }

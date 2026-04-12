@@ -240,11 +240,6 @@ export default class AppEnvConstructor {
       if (jasmine) {
         jasmine.getEnv().currentSpec.fail(error);
       }
-    } else if (this.inDevMode()) {
-      if (!this.isDevToolsOpened()) {
-        this.openDevTools();
-        this.executeJavaScriptInDevTools("DevToolsAPI.showPanel('console')");
-      }
     }
 
     if (

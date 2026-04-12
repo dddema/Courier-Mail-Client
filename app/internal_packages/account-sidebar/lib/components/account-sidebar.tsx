@@ -1,5 +1,5 @@
 import React from 'react';
-import { localized, Utils, DOMUtils, Account, AccountStore } from 'mailspring-exports';
+import { localized, Utils, DOMUtils, Actions, Account, AccountStore } from 'mailspring-exports';
 import { OutlineView, ScrollRegion, Flexbox } from 'mailspring-component-kit';
 import AccountSwitcher from './account-switcher';
 import SidebarStore from '../sidebar-store';
@@ -62,6 +62,22 @@ export default class AccountSidebar extends React.Component<
     return sections.map(section => <OutlineView key={section.title} {...section} />);
   }
 
+  _onCompose = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const legacyCompose = document.querySelector(
+      '.sheet-toolbar .item-compose'
+    ) as HTMLButtonElement | null;
+
+    if (legacyCompose) {
+      legacyCompose.click();
+      return;
+    }
+
+    Actions.composeNewBlankDraft();
+  };
+
   render() {
     const { accounts, sidebarAccountIds, userSections, standardSection } = this.state;
 
@@ -69,6 +85,20 @@ export default class AccountSidebar extends React.Component<
       <Flexbox direction="column" style={{ order: 0, flexShrink: 1, flex: 1 }}>
         <ScrollRegion className="account-sidebar" style={{ order: 2 }}>
           <AccountSwitcher accounts={accounts} sidebarAccountIds={sidebarAccountIds} />
+          <div className="sidebar-compose-wrap">
+            <button
+              className="btn sidebar-compose-button"
+              title={localized('Compose new message')}
+              aria-label={localized('Compose new message')}
+              onMouseDown={this._onCompose}
+              type="button"
+            >
+              <span className="sidebar-compose-glyph" aria-hidden="true">
+                ✎
+              </span>
+              <span>{localized('Compose')}</span>
+            </button>
+          </div>
           <nav className="account-sidebar-sections" aria-label={localized('Mailboxes')}>
             <OutlineView {...standardSection} />
             {this._renderUserSections(userSections)}

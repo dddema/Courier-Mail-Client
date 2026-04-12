@@ -232,6 +232,10 @@ class _AccountStore extends MailspringStore {
       throw new Error(`Returned account data is invalid: ${JSON.stringify(account)}`);
     }
 
+    // Ensure cloud-oriented account metadata is not persisted in local-only mode.
+    delete account.settings?.cloudToken;
+    delete account.settings?.mailspringIdToken;
+
     // send the account JSON and cloud token to the KeyManager,
     // which gives us back a version with no secrets.
     const cleanAccount = await KeyManager.extractAndStoreAccountSecrets(account);

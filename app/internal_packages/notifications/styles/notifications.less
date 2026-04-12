@@ -122,54 +122,52 @@
   width: 100%;
 
   .notification-info {
-    background-color: @background-color-info;
+    background-color: #dce8ff;
+    border-color: #c8d8ff;
   }
   .notification-developer {
-    background-color: #615396;
+    background-color: #e9e3ff;
+    border-color: #d9cffd;
   }
   .notification-upgrade {
-    background-image: linear-gradient(to top, #429e91, #40b1ac);
+    background-color: #2f8f88;
+    border-color: #297e78;
     img {
       background-color: @text-color-inverse;
     }
   }
   .notification-error {
-    background: linear-gradient(
-      to top,
-      darken(@background-color-error, 4%) 0%,
-      @background-color-error 100%
-    );
+    background-color: #d33b27;
     border-color: @background-color-error;
-    color: @color-error;
   }
   .notification-offline {
-    background: linear-gradient(to top, darken(#cc9900, 4%) 0%, #cc9900 100%);
+    background-color: #cc9900;
     border-color: darken(#cc9900, 5%);
   }
 
   .notifications-sticky-item {
     display: flex;
     font-size: @font-size-base;
-    color: @text-color-inverse;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    color: @text-color;
+    border-bottom: 1px solid @border-color-secondary;
     padding-left: @padding-base-horizontal;
     line-height: @line-height-base * 1.5;
     align-items: baseline;
     a {
       flex-shrink: 0;
-      color: @text-color-inverse;
+      color: @text-color;
       padding: 0 @padding-base-horizontal;
     }
     a:hover {
-      background-color: rgba(255, 255, 255, 0.15);
+      background-color: rgba(0, 0, 0, 0.08);
       text-decoration: none;
-      color: @text-color-inverse;
+      color: @text-color;
     }
     a.default {
-      background-color: rgba(0, 0, 0, 0.15);
+      background-color: rgba(0, 0, 0, 0.08);
     }
     a.default:hover {
-      background-color: rgba(255, 255, 255, 0.15);
+      background-color: rgba(0, 0, 0, 0.12);
     }
     i {
       margin-right: @padding-base-horizontal;
@@ -196,6 +194,29 @@
     &.has-default-action:hover {
       filter: brightness(110%);
       cursor: default;
+    }
+  }
+
+  .notifications-sticky-item.notification-upgrade,
+  .notifications-sticky-item.notification-error,
+  .notifications-sticky-item.notification-offline {
+    color: @text-color-inverse;
+
+    a {
+      color: @text-color-inverse;
+    }
+
+    a:hover {
+      color: @text-color-inverse;
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    a.default {
+      background-color: rgba(0, 0, 0, 0.18);
+    }
+
+    a.default:hover {
+      background-color: rgba(255, 255, 255, 0.14);
     }
   }
 }

@@ -1,8 +1,22 @@
 @import 'ui-variables';
 
 select {
-  // Set `border` property to allow styling for `select` controls
   border: 1px solid @dropdown-default-border-color;
   color: @dropdown-default-text-color;
   background: @dropdown-default-bg-color;
+  border-radius: @border-radius-large;
+  padding: 6px 12px;
+  font-size: 14px;
+  transition: all 0.15s ease-in-out;
+
+  &:focus {
+    border-color: @accent-primary;
+    box-shadow: 0 0 0 3px rgba(@accent-primary, 0.1);
+    outline: none;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }

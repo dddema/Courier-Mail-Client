@@ -1,20 +1,14 @@
 import MailspringStore from 'mailspring-store';
 
 import url from 'url';
-import querystring from 'querystring';
 
 import * as Utils from '../models/utils';
 import * as Actions from '../actions';
-import KeyManager from '../../key-manager';
-import { makeRequest, rootURLForServer } from '../mailspring-api-request';
-import { Disposable } from 'event-kit';
-
-// Note this key name is used when migrating to Mailspring Pro accounts from old N1.
-const PASSWORD_NAME = 'Mailspring Account';
 
 export interface IIdentity {
   id: string;
   token: string;
+  createdAt: string;
   firstName: string;
   lastName: string;
   emailAddress: string;
@@ -39,10 +33,20 @@ export const EMPTY_FEATURE_USAGE = {
   quota: 0,
 };
 
+const LOCAL_ONLY_IDENTITY: IIdentity = {
+  id: 'local-only-identity',
+  token: 'local-only-token',
+  createdAt: '1970-01-01T00:00:00.000Z',
+  firstName: 'Local',
+  lastName: 'User',
+  emailAddress: 'local@localhost',
+  stripePlan: 'Basic',
+  stripePlanEffective: 'Basic',
+  featureUsage: {},
+};
+
 class _IdentityStore extends MailspringStore {
-  _identity: IIdentity = null;
-  _displayedPasswordError = false;
-  _disp: Disposable;
+  _identity: IIdentity | null = null;
 
   constructor() {
     super();
@@ -59,20 +63,23 @@ class _IdentityStore extends MailspringStore {
     }
 
     AppEnv.config.onDidChange('identity', this._onIdentityChanged);
+    this._ensureLocalIdentityConfig();
     this._onIdentityChanged();
 
     this.listenTo(Actions.logoutMailspringIdentity, this._onLogoutMailspringIdentity);
-    this._fetchAndPollRemoteIdentity();
   }
 
   deactivate() {
-    if (this._disp) this._disp.dispose();
     this.stopListeningToAll();
   }
 
   identity() {
     if (!this._identity || !this._identity.id) return null;
     return Utils.deepClone(this._identity);
+  }
+
+  isValid() {
+    return true;
   }
 
   identityId() {
@@ -86,40 +93,31 @@ class _IdentityStore extends MailspringStore {
     return this._identity && this._identity.stripePlanEffective !== 'Basic';
   }
 
-  _fetchAndPollRemoteIdentity() {
-    if (!AppEnv.isMainWindow()) return;
-    setTimeout(() => {
-      this.fetchIdentity();
-    }, 1000);
-    setInterval(() => {
-      this.fetchIdentity();
-    }, 1000 * 60 * 10); // 10 minutes
+  _normalizeIdentity(identity: Partial<IIdentity> | null): IIdentity {
+    const createdAt =
+      identity && typeof identity.createdAt === 'string' && identity.createdAt.length > 0
+        ? identity.createdAt
+        : LOCAL_ONLY_IDENTITY.createdAt;
+
+    return {
+      ...LOCAL_ONLY_IDENTITY,
+      ...(identity || {}),
+      createdAt,
+      token: LOCAL_ONLY_IDENTITY.token,
+      featureUsage: (identity && identity.featureUsage) || {},
+    };
+  }
+
+  _ensureLocalIdentityConfig() {
+    const value = AppEnv.config.get('identity');
+    const normalized = this._normalizeIdentity(value);
+    const { token, ...rest } = normalized;
+    AppEnv.config.set('identity', rest);
   }
 
   async saveIdentity(identity: IIdentity | null) {
-    if (!identity) {
-      this._identity = null;
-      await KeyManager.deletePassword(PASSWORD_NAME);
-      AppEnv.config.set('identity', null);
-      return;
-    }
-
-    const { token, ...rest } = identity;
-
-    // allow someone to call saveIdentity without the token,
-    // and only save it if it's been changed (expensive call.)
-    const oldToken = this._identity ? this._identity.token : null;
-    const nextToken = token || oldToken;
-
-    if (nextToken && nextToken !== oldToken) {
-      // Note: We /must/ await this because calling config.set below
-      // will try to retrieve the password via getPassword.
-      // If this fails, the app may quit here.
-      await KeyManager.replacePassword(PASSWORD_NAME, nextToken);
-    }
-
-    this._identity = identity;
-    this._identity.token = nextToken;
+    this._identity = this._normalizeIdentity(identity);
+    const { token, ...rest } = this._identity;
     AppEnv.config.set('identity', rest);
 
     // Setting AppEnv.config will trigger our onDidChange handler,
@@ -132,32 +130,13 @@ class _IdentityStore extends MailspringStore {
    */
   _onIdentityChanged = async () => {
     const value = AppEnv.config.get('identity');
-    this._identity = value
-      ? { ...value, token: await KeyManager.getPassword(PASSWORD_NAME) }
-      : null;
-
-    if (this._identity && !this._identity.token) {
-      const message = `Your Mailspring ID password could not be loaded from your keychain. Please visit Preferences > Subscription and click "Setup Mailspring ID" to sign in to your Mailspring account again.\n\nYour Mailspring ID email address is ${this._identity.emailAddress}.`;
-      console.warn(message);
-
-      if (!this._displayedPasswordError) {
-        this._displayedPasswordError = true;
-        AppEnv.showErrorDialog({ title: 'Please Sign In', message });
-      }
-      this._identity = null;
-    }
+    this._identity = this._normalizeIdentity(value);
 
     this.trigger();
   };
 
   _onLogoutMailspringIdentity = async () => {
-    // Do not touch the keychain or restart the app during specs.
-    if (AppEnv.inSpecMode()) return;
-    await this.saveIdentity(null);
-    // We need to relaunch the app to clear the webview session
-    // and prevent the webview from re signing in with the same MailspringID
-    require('@electron/remote').app.relaunch();
-    require('@electron/remote').app.quit();
+    await this.saveIdentity(LOCAL_ONLY_IDENTITY);
   };
 
   /**
@@ -170,75 +149,18 @@ class _IdentityStore extends MailspringStore {
     path: string,
     { source, campaign, content }: { source?: string; campaign?: string; content?: string } = {}
   ) {
-    if (!this._identity) {
-      return Promise.reject(new Error('fetchSingleSignOnURL: no identity set.'));
-    }
-
-    const qs: any = { utm_medium: 'N1' };
-    if (source) {
-      qs.utm_source = source;
-    }
-    if (campaign) {
-      qs.utm_campaign = campaign;
-    }
-    if (content) {
-      qs.utm_content = content;
-    }
-
-    const pathWithUtm = url.parse(path, true);
-    pathWithUtm.query = Object.assign({}, qs, pathWithUtm.query || {});
-
-    const pathWithUtmString = url.format({
-      pathname: pathWithUtm.pathname,
-      query: pathWithUtm.query,
-    });
-
-    if (!pathWithUtmString.startsWith('/')) {
+    const pathWithQuery = url.format(url.parse(path, true));
+    if (!pathWithQuery.startsWith('/')) {
       throw new Error('fetchSingleSignOnURL: path must start with a leading slash.');
     }
 
-    const body = new FormData();
-    for (const key of Object.keys(qs)) {
-      body.append(key, qs[key]);
-    }
-    body.append('next_path', pathWithUtmString);
-
-    try {
-      const json = await makeRequest({
-        server: 'identity',
-        path: `/api/login-link?${querystring.stringify(qs)}`,
-        body: body,
-        timeout: 1500,
-        method: 'POST',
-      });
-      return `${rootURLForServer('identity')}${json.path}`;
-    } catch (err) {
-      return `${rootURLForServer('identity')}${path}`;
-    }
+    return `about:blank${pathWithQuery}`;
   }
 
   async fetchIdentity() {
-    if (!this._identity || !this._identity.token) {
-      return null;
+    if (!this._identity) {
+      await this.saveIdentity(LOCAL_ONLY_IDENTITY);
     }
-
-    const json = await makeRequest({
-      server: 'identity',
-      path: '/api/me',
-      method: 'GET',
-    });
-
-    if (!json || !json.id) {
-      AppEnv.reportError(new Error('/api/me returned invalid json'), json || {});
-      return this._identity;
-    }
-
-    if (json.id !== this._identity.id) {
-      console.log('Note: server returned a different identity object.');
-    }
-
-    const nextIdentity = Object.assign({}, this._identity, json);
-    await this.saveIdentity(nextIdentity);
     return this._identity;
   }
 }

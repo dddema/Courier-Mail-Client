@@ -53,16 +53,8 @@ class OnboardingStore extends MailspringStore {
     } else if (addingAccount) {
       // Adding a new, unknown account
       this._pageStack = ['account-choose'];
-    } else if (identity) {
-      // Should only happen if config was edited to remove all accounts,
-      // but don't want to re-login to Mailspring account. Very useful when
-      // switching environments.
+    } else if (identity || hasAccounts) {
       this._pageStack = ['account-choose'];
-    } else if (hasAccounts) {
-      // Should only happen when the user has "signed out" of their Mailspring ID,
-      // but already has accounts synced. Or is upgrading from a very old build.
-      // We used to show "Welcome Back", but now just jump to sign in.
-      this._pageStack = ['authenticate'];
     } else {
       // Standard new user onboarding flow.
       this._pageStack = ['welcome'];
@@ -125,14 +117,12 @@ class OnboardingStore extends MailspringStore {
     const isFirstAccount = AccountStore.accounts().length === 0;
     const emptyAccount = this._account.clone();
 
-    if ('skipped' in json) {
-      await IdentityStore.saveIdentity(null);
-    } else {
-      await IdentityStore.saveIdentity(json);
-
+    if (!('skipped' in json)) {
       emptyAccount.name = `${json.firstName || ''} ${json.lastName || ''}`;
       emptyAccount.emailAddress = json.emailAddress;
     }
+
+    await IdentityStore.fetchIdentity();
 
     setTimeout(() => {
       if (isFirstAccount) {

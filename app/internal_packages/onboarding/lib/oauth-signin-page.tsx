@@ -70,13 +70,38 @@ export default class OAuthSignInPage extends React.Component<
 
     // launch a web server
     this._server = http.createServer((request, response) => {
-      if (!this._mounted) return;
+      if (!this._mounted) {
+        response.writeHead(410, { 'Content-Type': 'text/plain; charset=utf-8' });
+        response.end(
+          'This authentication session has expired. Return to Mailspring and try again.'
+        );
+        return;
+      }
+
       const { query } = url.parse(request.url, true);
-      if (query.code) {
-        this._onReceivedCode(query.code);
-        response.writeHead(302, { Location: 'https://id.getmailspring.com/oauth/finished' });
-        response.end();
+
+      const rawCode = query.code;
+      const code = Array.isArray(rawCode) ? rawCode[0] : rawCode;
+
+      if (query.error) {
+        const rawErr = Array.isArray(query.error) ? query.error[0] : query.error;
+        const rawDesc = Array.isArray(query.error_description)
+          ? query.error_description[0]
+          : query.error_description;
+        const errMessage = rawDesc || rawErr || 'Authentication was cancelled.';
+        this._onError(new Error(errMessage));
+        response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        response.end(
+          '<html><body><h3>Authentication was cancelled.</h3><p>You can close this tab and return to Mailspring.</p></body></html>'
+        );
+      } else if (code) {
+        this._onReceivedCode(code);
+        response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        response.end(
+          '<html><body><h3>Authentication complete.</h3><p>You can close this tab and return to Mailspring.</p></body></html>'
+        );
       } else {
+        response.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
         response.end('Unknown Request');
       }
     });
@@ -89,7 +114,9 @@ export default class OAuthSignInPage extends React.Component<
         ),
       });
     });
-    this._server.listen(LOCAL_SERVER_PORT);
+
+    // Bind explicitly to the same host used by redirect_uri to avoid IPv4/IPv6 mismatch.
+    this._server.listen(LOCAL_SERVER_PORT, '127.0.0.1');
   }
 
   componentWillUnmount() {

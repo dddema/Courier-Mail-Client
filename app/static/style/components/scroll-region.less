@@ -1,20 +1,20 @@
 @import 'ui-variables';
 
 @tooltip-border-color: rgba(54, 56, 57, 0.9);
-@tooltip-background: -webkit-gradient(linear, left top, left bottom, from(rgba(99, 102, 103, 0.9)), to(rgba(82, 85, 86, 0.9)));
+@tooltip-background: rgba(32, 33, 36, 0.9);
 
 .scroll-tooltip {
-  background: @tooltip-background;
+  background: rgba(32, 33, 36, 0.9);
   color: white;
-  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.25);
-  padding: @padding-base-vertical @padding-base-horizontal @padding-base-vertical
-    @padding-base-horizontal;
-  border: 1px solid @tooltip-border-color;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  padding: 8px 12px;
+  border: none;
   border-radius: @border-radius-base;
-  transform: translate(-15px, 0);
+  transform: translate(-10px, -8px);
   position: relative;
   white-space: nowrap;
   pointer-events: none;
+  font-size: 12px;
 }
 .scroll-tooltip:after,
 .scroll-tooltip:before {

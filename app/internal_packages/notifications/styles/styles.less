@@ -9,7 +9,7 @@
 .notification {
   background: @background-color-info;
   display: none;
-  color: @text-color-inverse;
+  color: @text-color;
   margin: 10px;
   margin-top: 0;
   border-radius: @border-radius-large;
@@ -17,10 +17,12 @@
 
 .notification.error {
   background: @background-color-error;
+  color: @text-color-inverse;
 }
 
 .notification.offline {
-  background: linear-gradient(to top, darken(#cc9900, 4%) 0%, #cc9900 100%);
+  background: #cc9900;
+  color: @text-color-inverse;
 }
 
 .notification.highest-priority {
@@ -72,8 +74,8 @@
   justify-content: center;
   text-align: center;
   flex: 1;
-  border-top: solid rgba(255, 255, 255, 0.5) 1px;
-  border-left: solid rgba(255, 255, 255, 0.5) 1px;
+  border-top: solid rgba(0, 0, 0, 0.12) 1px;
+  border-left: solid rgba(0, 0, 0, 0.12) 1px;
   padding: 10px;
   cursor: pointer;
 
@@ -88,7 +90,7 @@
 }
 
 .notification .action:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.06);
   box-shadow: @standard-shadow inset;
 }
 
@@ -96,4 +98,16 @@
   cursor: progress;
   background-color: rgba(0, 0, 0, 0.2);
   box-shadow: @standard-shadow inset;
+}
+
+.notification.error,
+.notification.offline {
+  .action {
+    border-top: solid rgba(255, 255, 255, 0.3) 1px;
+    border-left: solid rgba(255, 255, 255, 0.3) 1px;
+  }
+
+  .action:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+  }
 }

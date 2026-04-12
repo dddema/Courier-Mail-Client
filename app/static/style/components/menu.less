@@ -6,10 +6,10 @@
   flex-direction: column;
 
   .header-container {
-    flex-shrink: 0; // Don't squish the header! There may be a search box here
-    background-color: @background-secondary;
+    flex-shrink: 0;
+    background-color: @background-primary;
     border-bottom: 1px solid @border-color-secondary;
-    padding: 3px;
+    padding: 8px 12px;
     position: relative;
   }
 
@@ -18,27 +18,31 @@
   }
 
   .content-container {
-    background: @background-secondary;
+    background: @background-primary;
     width: 100%;
-    margin-top: -1px;
     overflow: auto;
   }
 
   .item {
     display: block;
     padding-left: @padding-base-horizontal;
-    padding-top: @padding-base-vertical;
-    padding-bottom: @padding-base-vertical;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-right: @padding-base-horizontal;
     cursor: default;
     color: @text-color;
     width: 100%;
     overflow: hidden;
+    transition: all 0.12s ease-in-out;
+    border-radius: 4px;
+    margin: 2px 4px;
 
     .primary {
       max-width: 100%;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+      font-weight: @font-weight-normal;
     }
     .secondary {
       max-width: 100%;
@@ -47,16 +51,19 @@
       text-overflow: ellipsis;
       padding-left: 5px;
       color: @text-color-very-subtle;
+      font-size: @font-size-smaller;
     }
   }
 
   .item.divider {
     font-weight: @font-weight-semi-bold;
-    color: @border-color-divider;
-    font-size: @font-size-small;
+    color: @text-color-very-subtle;
+    font-size: @font-size-smaller;
     text-transform: uppercase;
-    margin-top: 10px;
+    margin-top: 12px;
+    margin-bottom: 4px;
     pointer-events: none;
+    letter-spacing: 0.4px;
   }
 
   .item.checked {
@@ -72,19 +79,20 @@
   .item.selected,
   .item:active {
     text-decoration: none;
-    background-color: @accent-primary;
-    color: @text-color-inverse;
+    background-color: @menu-item-color-selected;
+    color: @text-color;
     .primary {
-      color: @text-color-inverse;
+      color: @text-color;
+      font-weight: @font-weight-medium;
     }
     .secondary {
-      color: @text-color-inverse-very-subtle;
+      color: @text-color-subtle;
     }
   }
 
   .item:not(.active):not(.selected):hover {
     text-decoration: none;
-    background-color: fade(@black, 3%);
+    background-color: @menu-item-color-hover;
   }
 }
 body.platform-win32 {
@@ -99,14 +107,15 @@ body.platform-win32 {
 
 .dropdown-menu {
   .menu {
-    background: @background-secondary;
+    background: @background-primary;
     width: 250px;
     max-height: 400px;
-    box-shadow: 0 0.5px 0 rgba(0, 0, 0, 0.15), 0 -0.5px 0 rgba(0, 0, 0, 0.15),
-      0.5px 0 0 rgba(0, 0, 0, 0.15), -0.5px 0 0 rgba(0, 0, 0, 0.15), 0 4px 7px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), 0 1px 4px rgba(0, 0, 0, 0.08);
+    border-radius: @border-radius-large;
+    border: 1px solid @border-color-secondary;
 
     .header-container {
-      border-bottom: 0;
+      border-bottom: 1px solid @border-color-secondary;
     }
   }
 }
