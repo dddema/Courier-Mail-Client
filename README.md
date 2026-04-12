@@ -20,25 +20,7 @@ your email credentials to the cloud.** For a full list of features, check out
 
 ## Download Mailspring
 
-You can download compiled versions of Mailspring for Windows, Mac OS X, and
-Linux (deb, rpm and snap) from
-[https://getmailspring.com/download](https://getmailspring.com/download).
-
-## Getting Help
-
-You can find community-based help and discussion with other Mailspring users on our
-[Discourse community](https://community.getmailspring.com/).
-
-## Contributing
-
-Mailspring is entirely open-source. Pull requests and contributions are
-welcome! There are three ways to contribute: building a plugin, building a
-theme, and submitting pull requests to the project itself. When you're getting
-started, you may want to join our
-[Discourse](https://community.getmailspring.com/) so you can ask questions and
-learn from other people doing development.
-
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
+WIP
 
 ### Running Mailspring from Source
 
@@ -51,13 +33,7 @@ npm install
 npm start
 ```
 
-You can attach command line parameters by separating them using a double hyphen:
-
-```
-npm start -- --help
-```
-
-### Building Mailspring
+#### Building Mailspring
 
 To build Mailspring, you need to run the following command from the root directory
 of the Mailspring repository:
@@ -101,18 +77,3 @@ If you are updating an existing Nylas theme for Mailspring here is a
 Notice: as part of the update process you will probably need to [import mailspring base variables](https://github.com/Foundry376/Mailspring/issues/326#issuecomment-343757775).
 
 You can share and browse Mailspring Themes, and discuss theme development with other developers, on our [Discourse](https://community.getmailspring.com/).
-
-### Localizing / Translating
-
-Mailspring (1.5.0 and above) supports localization. If you're a fluent speaker of
-another language, we'd love your help improving translations. Check out the
-[LOCALIZATION](https://github.com/Foundry376/Mailspring/blob/master/LOCALIZATION.md)
-guide for more information. You can discuss localization and translation with
-other developers on our [Discourse](https://community.getmailspring.com/).
-
-### Contributing to Mailspring Core
-
-Pull requests are always welcome - check out
-[CONTRIBUTING](https://github.com/Foundry376/Mailspring/blob/master/CONTRIBUTING.md)
-for more information about setting up the development environment, running
-tests locally, and submitting pull requests.
