@@ -6,7 +6,7 @@ Mailspring's UI is open source (GPLv3) and written in TypeScript with [Electron]
 
 Mailspring's sync engine is spawned by the Electron application and runs locally on your computer. [It is open source (GPLv3) and written in C++ and C.](https://github.com/Foundry376/Mailspring-Sync) For convenience, however, when you set up your development environment, Mailspring uses the latest version of the sync engine we've shipped for your platform so you don't need to pull sources or install its compile-time dependencies.
 
-![Mailspring Screenshot](https://github.com/Foundry376/Mailspring/raw/master/screenshots/hero_graphic_mac%402x.png)
+![Mailspring Screenshot](https://github.com/Foundry376/Mailspring/raw/master/screenshots/mail_sample_mac.png)
 
 ## Features
 
