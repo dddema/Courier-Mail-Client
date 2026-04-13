@@ -151,9 +151,7 @@ export default class OAuthSignInPage extends React.Component<
     this._server = http.createServer((request, response) => {
       if (!this._mounted) {
         response.writeHead(410, { 'Content-Type': 'text/plain; charset=utf-8' });
-        response.end(
-          'This authentication session has expired. Return to Courier and try again.'
-        );
+        response.end('This authentication session has expired. Return to Courier and try again.');
         return;
       }
 

@@ -1,5 +1,6 @@
 /* eslint global-require: 0 */
 import path from 'path';
+import fs from 'fs';
 import createDebug from 'debug';
 import childProcess, { ChildProcess } from 'child_process';
 import { LRUCache } from 'lru-cache';
@@ -67,6 +68,16 @@ async function openDatabase(dbPath) {
     db.pragma(`main.synchronous = NORMAL`);
     return db;
   } catch (err) {
+    const dbMissing = !fs.existsSync(dbPath);
+    const openFailed = /unable to open database file/i.test(`${err}`);
+
+    // On fresh installs the sync process may not have created the DB file yet.
+    // Retry shortly instead of forcing a reset/relaunch loop.
+    if (dbMissing && openFailed) {
+      debug(`Database file not available yet at ${dbPath}. Retrying...`);
+      return null;
+    }
+
     handleUnrecoverableDatabaseError(err);
     return null;
   }
@@ -130,6 +141,7 @@ Section: Database
 */
 class DatabaseStore extends MailspringStore {
   _open = false;
+  _opening = false;
   _waiting = [];
   _preparedStatementCache = new LRUCache<string, Sqlite3.Statement<any[]>>({ max: 500 });
   _databasePath = databasePath(AppEnv.getConfigDirPath(), AppEnv.inSpecMode());
@@ -146,7 +158,19 @@ class DatabaseStore extends MailspringStore {
   }
 
   async open() {
+    if (this._open || this._opening) {
+      return;
+    }
+
+    this._opening = true;
     this._db = await openDatabase(this._databasePath);
+    this._opening = false;
+
+    if (!this._db) {
+      setTimeout(() => this.open(), 1000);
+      return;
+    }
+
     this._open = true;
     for (const w of this._waiting) {
       w();

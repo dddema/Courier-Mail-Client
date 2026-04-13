@@ -89,9 +89,7 @@ class ThemePicker extends React.Component<
       <div className="theme-picker">
         <Flexbox direction="column">
           <h4 className="theme-picker-title">{localized('Themes')}</h4>
-          <div className="theme-picker-subtitle">
-            {localized('Click any theme to apply:')}
-          </div>
+          <div className="theme-picker-subtitle">{localized('Click any theme to apply:')}</div>
           <ScrollRegion style={{ margin: '10px 5px 0 5px', height: '300px' }}>
             <Flexbox
               direction="row"
@@ -102,7 +100,10 @@ class ThemePicker extends React.Component<
             </Flexbox>
           </ScrollRegion>
           <div className="create-theme">
-            <a href="https://github.com/Foundry376/Mailspring-Theme-Starter" className="create-theme-link">
+            <a
+              href="https://github.com/Foundry376/Mailspring-Theme-Starter"
+              className="create-theme-link"
+            >
               {localized('Create a Theme')}
             </a>
           </div>

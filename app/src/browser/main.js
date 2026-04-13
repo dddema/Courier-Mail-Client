@@ -18,15 +18,29 @@ if (typeof process.setFdLimit === 'function') {
 
 const setupConfigDir = args => {
   let dirname = 'Courier';
+  let legacyDirname = 'Mailspring';
   if (args.devMode) {
     dirname = 'Courier-dev';
+    legacyDirname = 'Mailspring-dev';
   }
   if (args.specMode) {
     dirname = 'Courier-spec';
+    legacyDirname = 'Mailspring-spec';
   }
-  
+ 
   // Check if a custom config dir was provided via --config-dir-path
-  let configDirPath = args.configDirPath || path.join(app.getPath('appData'), dirname);
+  const appDataPath = app.getPath('appData');
+  let configDirPath = args.configDirPath || path.join(appDataPath, dirname);
+
+  // Backward compatibility: if Courier config doesn't exist yet but legacy
+  // Mailspring data does, continue using the legacy directory so existing
+  // local database and account cache can be reused.
+  if (!args.configDirPath) {
+    const legacyConfigDirPath = path.join(appDataPath, legacyDirname);
+    if (!fs.existsSync(configDirPath) && fs.existsSync(legacyConfigDirPath)) {
+      configDirPath = legacyConfigDirPath;
+    }
+  }
   
   if (process.platform === 'linux' && process.env.SNAP) {
     // for linux snap, use the sandbox directory that is persisted between snap revisions

@@ -190,7 +190,8 @@ export default class Application extends EventEmitter {
     }
 
     const selectedStyle = this.config.get('core.workspace.appIconStyle') || 'default';
-    const filename = this._macAppIconFileByStyle[selectedStyle] || this._macAppIconFileByStyle.default;
+    const filename =
+      this._macAppIconFileByStyle[selectedStyle] || this._macAppIconFileByStyle.default;
     const iconPath = path.join(this.resourcePath, 'build', 'resources', 'mac', filename);
 
     const stylePngFilename =
