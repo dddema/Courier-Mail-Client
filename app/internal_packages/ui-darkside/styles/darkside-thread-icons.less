@@ -80,7 +80,19 @@
   filter: none;
 }
 
-.thread-list .list-item.focused:hover .list-column-HoverActions .inner .action.action-trash {
+.thread-list .list-item:hover .list-column-HoverActions .inner .action.action-archive,
+.thread-list .list-item.focused:hover .list-column-HoverActions .inner .action.action-archive,
+.thread-list .list-item.selected:hover .list-column-HoverActions .inner .action.action-archive,
+.thread-list.handler-split .list-item.selected:hover .list-column-HoverActions .inner .action.action-archive {
+  background: url('../static/images/thread-list-quick-actions/ic-quick-button-archive@2x.png')
+      center no-repeat,
+    linear-gradient(to top, rgba(241, 241, 241, 0.75) 0%, rgba(253, 253, 253, 0.75) 100%);
+}
+
+.thread-list .list-item:hover .list-column-HoverActions .inner .action.action-trash,
+.thread-list .list-item.focused:hover .list-column-HoverActions .inner .action.action-trash,
+.thread-list .list-item.selected:hover .list-column-HoverActions .inner .action.action-trash,
+.thread-list.handler-split .list-item.selected:hover .list-column-HoverActions .inner .action.action-trash {
   background: url('../static/images/thread-list-quick-actions/ic-quick-button-trash@2x.png') center
       no-repeat,
     linear-gradient(to top, rgba(241, 241, 241, 0.75) 0%, rgba(253, 253, 253, 0.75) 100%);

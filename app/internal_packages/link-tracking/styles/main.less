@@ -2,11 +2,11 @@
 @import 'ui-mixins';
 
 .link-tracking-icon img.content-mask {
-  background-color: #aaa;
+  background-color: fade(@text-color, 45%);
   vertical-align: text-bottom;
 }
 .link-tracking-icon img.content-mask.clicked {
-  background-color: #ccc;
+  background-color: fade(@text-color, 65%);
 }
 .link-tracking-icon .link-click-count {
   display: inline-block;
@@ -14,7 +14,7 @@
   left: -16px;
   text-align: center;
 
-  color: #3187e1;
+  color: @accent-primary;
   font-size: 12px;
   font-weight: bold;
 }
@@ -24,8 +24,8 @@
 }
 
 .link-tracking-panel {
-  background: #ddf6ff;
-  border: 1px solid #acd;
+  background: mix(@background-primary, @accent-primary, 90%);
+  border: 1px solid mix(@background-primary, @accent-primary, 72%);
   padding: 5px;
   border-radius: 5px;
 }
@@ -38,8 +38,8 @@
   width: 100%;
 }
 .link-tracking-panel td {
-  border-bottom: 1px solid #d5eaf5;
-  border-top: 1px solid #d5eaf5;
+  border-bottom: 1px solid mix(@background-primary, @accent-primary, 82%);
+  border-top: 1px solid mix(@background-primary, @accent-primary, 82%);
   padding: 0 10px;
   text-align: left;
 }

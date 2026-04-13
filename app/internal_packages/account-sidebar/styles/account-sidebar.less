@@ -19,8 +19,8 @@
     gap: 10px;
     height: 40px;
     border-radius: 12px;
-    border: 1px solid rgba(31, 113, 232, 0.2);
-    background: rgba(31, 113, 232, 0.16);
+    border: 1px solid fade(@accent-primary, 35%);
+    background: fade(@accent-primary, 20%);
     color: @text-color;
     font-weight: @font-weight-medium;
     padding: 0 16px;
@@ -41,12 +41,12 @@
     }
 
     &:hover {
-      background: rgba(31, 113, 232, 0.22);
-      border-color: rgba(31, 113, 232, 0.32);
+      background: fade(@accent-primary, 28%);
+      border-color: fade(@accent-primary, 48%);
     }
 
     &:active {
-      background: rgba(31, 113, 232, 0.28);
+      background: fade(@accent-primary, 34%);
     }
   }
 
