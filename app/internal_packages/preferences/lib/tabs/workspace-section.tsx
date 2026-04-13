@@ -67,7 +67,7 @@ class DefaultMailClientItem extends React.Component<
               }
             }}
           >
-            {localized('Use Mailspring as default mail client')}
+            {localized('Use Courier as default mail client')}
           </div>
         </div>
       );
@@ -81,7 +81,7 @@ class DefaultMailClientItem extends React.Component<
           checked={this.state.defaultClient}
           onChange={this.toggleDefaultMailClient}
         />
-        <label htmlFor="default-client">{localized('Use Mailspring as default mail client')}</label>
+        <label htmlFor="default-client">{localized('Use Courier as default mail client')}</label>
       </div>
     );
   }

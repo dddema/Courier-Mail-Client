@@ -174,7 +174,7 @@ export default class AutoUpdateManager extends EventEmitter {
       global.application.resourcePath,
       'static',
       'images',
-      'mailspring.png'
+      'Courier-Icon-Default.png'
     );
     if (!fs.existsSync(iconPath)) return undefined;
     return nativeImage.createFromPath(iconPath);
@@ -188,7 +188,7 @@ export default class AutoUpdateManager extends EventEmitter {
       icon: this.dialogIcon(),
       message: localized('No update available.'),
       title: localized('No update available.'),
-      detail: localized(`You're running the latest version of Mailspring (%@).`, this.version),
+      detail: localized(`You're running the latest version of Courier (%@).`, this.version),
     });
   };
 

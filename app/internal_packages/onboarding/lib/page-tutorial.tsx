@@ -8,7 +8,7 @@ const Steps = [
     title: localized('Compose with context'),
     image: 'feature-people@2x.png',
     description: localized(
-      'Mailspring shows you everything about your contacts right inside your inbox. See LinkedIn profiles, Twitter bios, message history, and more.'
+      'Courier shows you everything about your contacts right inside your inbox. See LinkedIn profiles, Twitter bios, message history, and more.'
     ),
     x: 96.6,
     y: 1.3,

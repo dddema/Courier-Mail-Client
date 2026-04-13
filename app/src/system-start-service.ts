@@ -131,7 +131,7 @@ class SystemStartServiceWin32 extends SystemStartServiceBase {
     try {
       const success = shell.writeShortcutLink(this._shortcutPath(), 'create', {
         target: this._launcherPath(),
-        args: '--processStart mailspring.exe --process-start-args "--background"',
+        args: '--processStart courier.exe --process-start-args "--background"',
         description: 'An extensible, open-source mail client built on the modern web.',
         appUserModelId: 'com.squirrel.mailspring.mailspring',
       });
@@ -148,7 +148,7 @@ class SystemStartServiceWin32 extends SystemStartServiceBase {
   }
 
   _launcherPath() {
-    return path.join(process.env.LOCALAPPDATA, 'mailspring', 'Update.exe');
+    return path.join(process.env.LOCALAPPDATA, 'Courier', 'Update.exe');
   }
 
   _shortcutPath() {
@@ -159,7 +159,7 @@ class SystemStartServiceWin32 extends SystemStartServiceBase {
       'Start Menu',
       'Programs',
       'Startup',
-      'Mailspring.lnk'
+      'Courier.lnk'
     );
   }
 }

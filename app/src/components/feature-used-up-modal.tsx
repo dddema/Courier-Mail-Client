@@ -59,7 +59,7 @@ export default class FeatureUsedUpModal extends React.Component<{
         </div>
         <div className="feature-cta">
           <div className="pro-description">
-            <h3>{localized('Upgrade to Mailspring Pro')}</h3>
+            <h3>{localized('Upgrade to Courier Pro')}</h3>
             <ul>
               <li>{localized('Unlimited Connected Accounts')}</li>
               <li>{localized('Unlimited Contact Profiles')}</li>

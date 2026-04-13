@@ -3,7 +3,7 @@ import { localized, localizedReactFragment, React } from 'mailspring-exports';
 const AccountProviders = [
   {
     provider: 'gmail',
-    displayName: 'Gmail or G Suite',
+    displayName: 'Gmail or GSuite',
     icon: 'ic-settings-account-gmail.png',
     headerIcon: 'setup-icon-provider-gmail.png',
     color: '#FFFFFF00',

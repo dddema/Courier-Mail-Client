@@ -73,10 +73,10 @@ export class DefaultClientHelperWindows implements DCH {
             buttons: [localized('Open Settings'), localized('Cancel')],
             defaultId: 0,
             message: localized(
-              'Visit Windows Settings to finish making Mailspring your mail client'
+              'Visit Windows Settings to finish making Courier your mail client'
             ),
             detail: localized(
-              "Click 'Open Settings' to open Windows Settings where you can set Mailspring as your default email app."
+              "Click 'Open Settings' to open Windows Settings where you can set Courier as your default email app."
             ),
           });
           if (response === 0) {

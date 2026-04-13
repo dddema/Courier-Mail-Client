@@ -68,7 +68,7 @@ export default class ThreadSharingPopover extends React.Component<
           await FeatureUsageStore.markUsedOrUpgrade('thread-sharing', {
             headerText: localized('All Sharing Links Used'),
             rechargeText: `${localized(
-              `You can share %1$@ emails each %2$@ with Mailspring Basic.`
+              `You can share %1$@ emails each %2$@ with Courier Basic.`
             )} ${localized('Upgrade to Pro today!')}`,
             iconUrl: 'mailspring://thread-sharing/assets/ic-modal-image@2x.png',
           });
@@ -122,7 +122,7 @@ export default class ThreadSharingPopover extends React.Component<
               {localized('Syncing') + '...'}
               <div className="meta">
                 {localized(
-                  `Mailspring is syncing this thread and its attachments to the cloud. For long threads, this may take a moment.`
+                  `Courier is syncing this thread and its attachments to the cloud. For long threads, this may take a moment.`
                 )}
               </div>
             </label>

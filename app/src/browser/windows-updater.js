@@ -187,7 +187,7 @@ exports.existsSync = () => fs.existsSync(updateDotExe);
 // Registry path: HKEY_CURRENT_USER\SOFTWARE\Classes\AppUserModelId\{AUMID}
 function registerAppUserModelId(callback) {
   const aumid = 'com.squirrel.mailspring.mailspring';
-  const displayName = 'Mailspring';
+  const displayName = 'Courier';
   const iconPath = path.join(appFolder, 'resources', 'mailspring-square.ico');
 
   let regPath = 'reg.exe';
@@ -284,18 +284,18 @@ exports.handleSquirrelInstall = app => {
     'Windows',
     'Start Menu',
     'Programs',
-    'Mailspring.lnk'
+    'Courier.lnk'
   );
   const desktopPath = path.join(
     process.env.USERPROFILE || process.env.HOME,
     'Desktop',
-    'Mailspring.lnk'
+    'Courier.lnk'
   );
   const iconPath = path.join(appFolder, 'resources', 'mailspring-square.ico');
 
   const shortcutOptions = {
     target: updateDotExe,
-    args: '--processStart mailspring.exe',
+    args: '--processStart courier.exe',
     icon: fs.existsSync(iconPath) ? iconPath : undefined,
     iconIndex: 0,
     description: 'The best email app for people and teams at work',
@@ -333,7 +333,7 @@ exports.handleSquirrelInstall = app => {
     '/t',
     'REG_SZ',
     '/d',
-    'Mailspring',
+    'Courier',
     '/f',
   ]);
   if (fs.existsSync(iconPath)) {
@@ -379,12 +379,12 @@ exports.handleSquirrelUninstall = app => {
     'Windows',
     'Start Menu',
     'Programs',
-    'Mailspring.lnk'
+    'Courier.lnk'
   );
   const desktopPath = path.join(
     process.env.USERPROFILE || process.env.HOME,
     'Desktop',
-    'Mailspring.lnk'
+    'Courier.lnk'
   );
 
   try {

@@ -17,12 +17,12 @@ if (typeof process.setFdLimit === 'function') {
 }
 
 const setupConfigDir = args => {
-  let dirname = 'Mailspring';
+  let dirname = 'Courier';
   if (args.devMode) {
-    dirname = 'Mailspring-dev';
+    dirname = 'Courier-dev';
   }
   if (args.specMode) {
-    dirname = 'Mailspring-spec';
+    dirname = 'Courier-spec';
   }
   
   // Check if a custom config dir was provided via --config-dir-path
@@ -294,7 +294,7 @@ const start = () => {
   // StatusNotifierItem ID on Linux, causing their tray visibility settings
   // to be synchronized. See: https://github.com/electron/electron/issues/40936
   if (process.platform === 'linux') {
-    app.setName('Mailspring');
+    app.setName('Courier');
   }
 
   if (handleStartupEventWithSquirrel()) {

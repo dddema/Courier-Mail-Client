@@ -1,6 +1,6 @@
 {
-  "name": "mailspring",
-  "productName": "Mailspring",
+  "name": "courier",
+  "productName": "Courier",
   "version": "1.19.1",
   "repository": {
     "type": "git",

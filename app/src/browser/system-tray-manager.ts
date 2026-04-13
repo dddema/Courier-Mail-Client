@@ -17,7 +17,7 @@ function _getMenuTemplate(platform, application) {
       type: 'separator',
     },
     {
-      label: localized('Quit Mailspring'),
+      label: localized('Quit Courier'),
       click: () => application.emit('application:quit'),
     },
   ];
