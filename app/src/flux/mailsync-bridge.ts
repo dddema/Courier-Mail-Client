@@ -23,6 +23,17 @@ import { Model } from 'mailspring-exports';
 const MAX_CRASH_HISTORY = 10;
 
 const VERBOSE_UNTIL_KEY = 'core.sync.verboseUntil';
+const FALLBACK_IDENTITY = {
+  id: 'local-only-identity',
+  token: 'local-only-token',
+  createdAt: '1970-01-01T00:00:00.000Z',
+  firstName: 'Local',
+  lastName: 'User',
+  emailAddress: 'local@localhost',
+  stripePlan: 'Basic',
+  stripePlanEffective: 'Basic',
+  featureUsage: {},
+};
 
 /*
 This class keeps track of how often Mailsync workers crash. If a mailsync
@@ -220,7 +231,7 @@ export default class MailsyncBridge {
     // create a new client that will perform the reset
     const resetClient = new MailsyncProcess(this._getClientConfiguration());
     resetClient.account = (await KeyManager.insertAccountSecrets(account)).toJSON();
-    resetClient.identity = IdentityStore.identity();
+    resetClient.identity = this._identityForClient();
 
     // no-op - do not allow us to kill this client - we may be reseting the cache of an
     // account which does not exist anymore, but we don't want to interrupt this process
@@ -284,6 +295,20 @@ export default class MailsyncBridge {
     return { configDirPath, resourcePath, verbose };
   }
 
+  _identityForClient() {
+    const identity = IdentityStore.identity() || {};
+    const createdAt =
+      typeof identity.createdAt === 'string' && identity.createdAt.length > 0
+        ? identity.createdAt
+        : FALLBACK_IDENTITY.createdAt;
+
+    return {
+      ...FALLBACK_IDENTITY,
+      ...identity,
+      createdAt,
+    };
+  }
+
   async _launchClient(account: Account, keys, { force }: { force?: boolean } = {}) {
     const client = new MailsyncProcess(this._getClientConfiguration());
     this._clients[account.id] = client; // set this synchornously so we never spawn two
@@ -298,7 +323,7 @@ export default class MailsyncBridge {
     }
 
     client.account = fullAccountJSON;
-    client.identity = IdentityStore.identity();
+    client.identity = this._identityForClient();
     client.sync();
     client.on('deltas', this._onIncomingMessages);
     client.on('close', ({ code, error, signal }: MailsyncProcessExit) => {
