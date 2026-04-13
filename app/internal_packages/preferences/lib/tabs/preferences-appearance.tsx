@@ -161,7 +161,8 @@ class AppearanceModeSwitch extends React.Component<
   };
 
   _renderModeOptions() {
-    return ['list', 'split', 'splitVertical'].map(mode => (
+    const modes: Array<'list' | 'split' | 'splitVertical'> = ['list', 'split', 'splitVertical'];
+    return modes.map(mode => (
       <AppearanceModeOption
         mode={mode}
         key={mode}
@@ -308,7 +309,80 @@ class TrayIconThemePicker extends React.Component<{ config: ConfigLike }> {
   }
 }
 
-const AppearanceModeOption = function AppearanceModeOption(props) {
+class MacAppIconPicker extends React.Component<{ config: ConfigLike }> {
+  kp = 'core.workspace.appIconStyle';
+  defaultPreview =
+    AppEnv.getLoadSettings().resourcePath + '/static/images/Courier-Icon-Default.png';
+
+  onChangeAppIconStyle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.props.config.set(this.kp, e.target.value);
+  };
+
+  render() {
+    if (process.platform !== 'darwin') return null;
+
+    const val = this.props.config.get(this.kp) || 'default';
+    const resourcePath = AppEnv.getLoadSettings().resourcePath;
+
+    const options = [
+      ['default', localized('Default'), `${resourcePath}/static/images/Courier-Icon-Default.png`],
+      ['dark', localized('Dark'), `${resourcePath}/static/images/Courier-Icon-Dark.png`],
+      [
+        'clearDark',
+        localized('Clear Dark'),
+        `${resourcePath}/static/images/Courier-Icon-ClearDark.png`,
+      ],
+      [
+        'clearLight',
+        localized('Clear Light'),
+        `${resourcePath}/static/images/Courier-Icon-ClearLight.png`,
+      ],
+    ];
+
+    return (
+      <section className="mac-app-icon-section">
+        <h6>{localized('App Icon')}</h6>
+        <div className="mac-app-icon-grid" role="radiogroup" aria-label={localized('App Icon')}>
+          {options.map(([enumValue, description, previewPath], idx) => (
+            <label
+              key={enumValue}
+              htmlFor={`app-icon-radio-${idx}`}
+              className={`mac-app-icon-option ${val === enumValue ? 'selected' : ''}`}
+            >
+              <input
+                id={`app-icon-radio-${idx}`}
+                className="mac-app-icon-radio"
+                type="radio"
+                value={enumValue}
+                name="appIconStyle"
+                checked={val === enumValue}
+                onChange={this.onChangeAppIconStyle}
+              />
+              <img
+                className="mac-app-icon-preview"
+                src={previewPath}
+                alt=""
+                aria-hidden="true"
+                onError={e => {
+                  e.currentTarget.src = this.defaultPreview;
+                }}
+              />
+              <span className="mac-app-icon-label">{description}</span>
+            </label>
+          ))}
+        </div>
+      </section>
+    );
+  }
+}
+
+interface AppearanceModeOptionProps {
+  mode: 'list' | 'split' | 'splitVertical';
+  active: boolean;
+  onClick: () => void;
+}
+
+const AppearanceModeOption = function AppearanceModeOption(props: AppearanceModeOptionProps) {
   let classname = 'appearance-mode';
   if (props.active) classname += ' active';
 
@@ -385,6 +459,7 @@ class PreferencesAppearance extends React.Component<{ config: ConfigLike; config
         </section>
         <TrayIconStylePicker config={this.props.config} />
         <TrayIconThemePicker config={this.props.config} />
+        <MacAppIconPicker config={this.props.config} />
       </div>
     );
   }

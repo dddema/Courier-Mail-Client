@@ -57,6 +57,20 @@ export default class Application extends EventEmitter {
   _sourceWindows: { [taskId: string]: BrowserWindow } = {};
   _resettingAndRelaunching: boolean;
 
+  _macAppIconFileByStyle = {
+    default: 'Courier-Default.icns',
+    dark: 'Courier-Dark.icns',
+    clearDark: 'Courier-ClearDark.icns',
+    clearLight: 'Courier-ClearLight.icns',
+  };
+
+  _macAppIconPngByStyle = {
+    default: 'Courier-Icon-Default.png',
+    dark: 'Courier-Icon-Dark.png',
+    clearDark: 'Courier-Icon-ClearDark.png',
+    clearLight: 'Courier-Icon-ClearLight.png',
+  };
+
   async start(options) {
     const { resourcePath, configDirPath, version, devMode, specMode, safeMode } = options;
 
@@ -85,13 +99,13 @@ export default class Application extends EventEmitter {
       let buttons = [localized('Quit')];
       if (err.toString().includes('ENOENT')) {
         message = localized(
-          `Mailspring could not find the mailsync process. If you're building Mailspring from source, make sure mailsync.tar.gz has been downloaded and unpacked in your working copy.`
+          `Courier could not find the mailsync process. If you're building Courier from source, make sure mailsync.tar.gz has been downloaded and unpacked in your working copy.`
         );
       } else if (err.toString().includes('spawn')) {
-        message = localized(`Mailspring could not spawn the mailsync process. %@`, err.toString());
+        message = localized(`Courier could not spawn the mailsync process. %@`, err.toString());
       } else {
         message = localized(
-          `We encountered a problem with your local email database. %@\n\nCheck that no other copies of Mailspring are running and click Rebuild to reset your local cache.`,
+          `We encountered a problem with your local email database. %@\n\nCheck that no other copies of Courier are running and click Rebuild to reset your local cache.`,
           err.toString()
         );
         buttons = [localized('Quit'), localized('Rebuild')];
@@ -147,6 +161,14 @@ export default class Application extends EventEmitter {
     }
 
     this.handleEvents();
+
+    if (process.platform === 'darwin') {
+      this._applyMacAppIconFromConfig();
+      this.config.onDidChange('core.workspace.appIconStyle', () => {
+        this._applyMacAppIconFromConfig();
+      });
+    }
+
     this.handleLaunchOptions(options);
 
     if (process.platform === 'linux') {
@@ -160,6 +182,42 @@ export default class Application extends EventEmitter {
   getMainWindow() {
     const win = this.windowManager.get(WindowManager.MAIN_WINDOW);
     return win ? win.browserWindow : null;
+  }
+
+  _applyMacAppIconFromConfig() {
+    if (process.platform !== 'darwin' || !app.dock || !app.dock.setIcon) {
+      return;
+    }
+
+    const selectedStyle = this.config.get('core.workspace.appIconStyle') || 'default';
+    const filename = this._macAppIconFileByStyle[selectedStyle] || this._macAppIconFileByStyle.default;
+    const iconPath = path.join(this.resourcePath, 'build', 'resources', 'mac', filename);
+
+    const stylePngFilename =
+      this._macAppIconPngByStyle[selectedStyle] || this._macAppIconPngByStyle.default;
+    const stylePngPath = path.join(this.resourcePath, 'static', 'images', stylePngFilename);
+    const defaultPngPath = path.join(
+      this.resourcePath,
+      'static',
+      'images',
+      this._macAppIconPngByStyle.default
+    );
+
+    const candidatePaths = [stylePngPath, iconPath, defaultPngPath].filter(p => fs.existsSync(p));
+
+    for (const candidatePath of candidatePaths) {
+      try {
+        const image = nativeImage.createFromPath(candidatePath);
+        if (image && !image.isEmpty()) {
+          app.dock.setIcon(image);
+          return;
+        }
+      } catch (err) {
+        console.warn('Failed to set macOS dock icon from path:', candidatePath, err);
+      }
+    }
+
+    console.warn('Could not load a valid macOS dock icon for style:', selectedStyle);
   }
 
   getAllWindowDimensions() {
@@ -277,7 +335,7 @@ export default class Application extends EventEmitter {
       this.windowManager.ensureWindow(WindowManager.MAIN_WINDOW);
     } else {
       this.windowManager.ensureWindow(WindowManager.ONBOARDING_WINDOW, {
-        title: localized('Welcome to Mailspring'),
+        title: localized('Welcome to Courier'),
       });
     }
   }
@@ -366,7 +424,7 @@ export default class Application extends EventEmitter {
         onboarding.focus();
       } else {
         this.windowManager.ensureWindow(WindowManager.ONBOARDING_WINDOW, {
-          title: localized('Welcome to Mailspring'),
+          title: localized('Welcome to Courier'),
           windowProps: {},
         });
       }

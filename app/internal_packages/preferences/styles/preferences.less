@@ -139,6 +139,12 @@
     width: 600px;
     margin: 0 auto;
 
+    .btn {
+      border: 1px solid @dropdown-default-border-color;
+      box-shadow: none;
+      border-radius: 5px;
+    }
+
     input[type='radio'] {
       vertical-align: middle;
     }
@@ -161,22 +167,24 @@
 
       .appearance-mode {
         background-color: @background-off-primary;
-        border-radius: 10px;
-        border: 1px solid @background-tertiary;
+        border-radius: 8px;
+        border: 1px solid @dropdown-default-border-color;
         text-align: center;
         flex: 1;
-        padding: 25px;
-        padding-bottom: 9px;
+        padding: 16px 10px 10px;
         margin-right: 10px;
-        margin-bottom: 7px;
+        margin-bottom: 10px;
         margin-top: 0;
         img {
-          background-color: @background-tertiary;
+          background-color: fade(@text-color, 45%);
         }
         div {
-          margin-top: 15px;
+          margin-top: 10px;
           text-transform: capitalize;
           cursor: default;
+        }
+        &:hover {
+          background: lighten(@background-off-primary, 1%);
         }
         &:last-child {
           margin-right: 0;
@@ -184,10 +192,64 @@
       }
       .appearance-mode.active {
         border: 1px solid @component-active-color;
+        box-shadow: 0 0 0 1px fade(@component-active-color, 30%);
         color: @component-active-color;
         img {
           background-color: @component-active-color;
         }
+      }
+    }
+
+    .mac-app-icon-section {
+      .mac-app-icon-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .mac-app-icon-option {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        width: 23%;
+        min-height: 122px;
+        border: 1px solid @dropdown-default-border-color;
+        border-radius: 8px;
+        background: @background-off-primary;
+        cursor: pointer;
+        padding: 10px 8px 8px;
+        user-select: none;
+      }
+
+      .mac-app-icon-option:hover {
+        background: lighten(@background-off-primary, 1%);
+      }
+
+      .mac-app-icon-option.selected {
+        border-color: @component-active-color;
+        box-shadow: 0 0 0 1px fade(@component-active-color, 30%);
+      }
+
+      .mac-app-icon-radio {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .mac-app-icon-preview {
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+        margin-bottom: 8px;
+      }
+
+      .mac-app-icon-label {
+        font-size: 12px;
+        line-height: 1.2;
+        text-align: center;
+        color: @text-color;
       }
     }
   }

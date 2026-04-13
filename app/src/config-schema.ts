@@ -50,6 +50,11 @@ export default {
             default: 'automatic',
             enum: ['automatic', 'light', 'dark'],
           },
+          appIconStyle: {
+            type: 'string',
+            default: 'default',
+            enum: ['default', 'dark', 'clearDark', 'clearLight'],
+          },
           showImportant: {
             type: 'boolean',
             default: true,
