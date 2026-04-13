@@ -47,7 +47,7 @@ class InitialPreferencesOptions extends React.Component<
 > {
   static propTypes = { config: PropTypes.object };
 
-  constructor(props) {
+  constructor(props: { account: Account; config?: any }) {
     super(props);
     this.state = { templates: [] };
     this._loadTemplates();
@@ -68,12 +68,12 @@ class InitialPreferencesOptions extends React.Component<
     });
   };
 
-  _setConfigDefaultsForAccount = templates => {
+  _setConfigDefaultsForAccount = (templates: string[]) => {
     if (!this.props.account) {
       return;
     }
 
-    const templateWithBasename = name => templates.find(t => t.indexOf(name) === 0);
+    const templateWithBasename = (name: string) => templates.find(t => t.indexOf(name) === 0);
 
     if (this.props.account.provider === 'gmail') {
       this.props.config.set('core.workspace.mode', 'list');
@@ -101,21 +101,12 @@ class InitialPreferencesOptions extends React.Component<
     }
 
     return (
-      <div
-        style={{
-          display: 'flex',
-          width: 600,
-          marginBottom: 50,
-          marginLeft: 150,
-          marginRight: 150,
-          textAlign: 'left',
-        }}
-      >
-        <div style={{ flex: 1 }}>
+      <div className="initial-preferences-content">
+        <div className="initial-preferences-column">
           <p>
             {localized('Do you prefer a single panel layout (like Gmail) or a two panel layout?')}
           </p>
-          <Flexbox direction="row" style={{ alignItems: 'center' }}>
+          <Flexbox direction="row" className="appearance-mode-row">
             {['list', 'split'].map(mode => (
               <AppearanceModeOption
                 mode={mode}
@@ -126,18 +117,15 @@ class InitialPreferencesOptions extends React.Component<
             ))}
           </Flexbox>
         </div>
-        <div
-          key="divider"
-          style={{ marginLeft: 20, marginRight: 20, borderLeft: '1px solid #ccc' }}
-        />
-        <div style={{ flex: 1 }}>
+        <div key="divider" className="initial-preferences-divider" />
+        <div className="initial-preferences-column">
           <p>
             {localized(
               `We've picked a set of keyboard shortcuts based on your email account and platform. You can also pick another set:`
             )}
           </p>
           <select
-            style={{ margin: 0 }}
+            className="initial-preferences-select"
             value={this.props.config.get('core.keymapTemplate')}
             onChange={event => this.props.config.set('core.keymapTemplate', event.target.value)}
           >
@@ -161,7 +149,7 @@ class InitialPreferencesPage extends React.Component<
 
   _unlisten?: () => void;
 
-  constructor(props) {
+  constructor(props: Record<string, unknown>) {
     super(props);
     this.state = { account: AccountStore.accounts()[0] };
   }
@@ -185,13 +173,15 @@ class InitialPreferencesPage extends React.Component<
       return <div />;
     }
     return (
-      <div className="page opaque" style={{ width: 900, height: 620 }}>
-        <h1 style={{ paddingTop: 100 }}>{localized(`Welcome to Mailspring`)}</h1>
-        <h4 style={{ marginBottom: 60 }}>{localized(`Let's set things up to your liking.`)}</h4>
+      <div className="page opaque initial-preferences">
+        <h1 className="initial-preferences-title">{localized(`Welcome to Courier`)}</h1>
+        <h4 className="initial-preferences-subtitle">
+          {localized(`Let's set things up to your liking.`)}
+        </h4>
         <ConfigPropContainer>
           <InitialPreferencesOptions account={this.state.account} />
         </ConfigPropContainer>
-        <button className="btn btn-large" style={{ marginBottom: 60 }} onClick={this._onFinished}>
+        <button className="btn btn-large initial-preferences-cta" onClick={this._onFinished}>
           {localized(`Looks Good!`)}
         </button>
       </div>

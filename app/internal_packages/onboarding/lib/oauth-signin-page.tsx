@@ -50,6 +50,85 @@ export default class OAuthSignInPage extends React.Component<
   _warnTimer: NodeJS.Timeout;
   _mounted = false;
 
+  _renderAuthResultPage(title: string, message: string, accentHex: string) {
+    return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${title}</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Inter", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: #2f3a48;
+        background: #f2f3f5;
+        padding: 18px;
+      }
+      .card {
+        width: 100%;
+        max-width: 560px;
+        border-radius: 12px;
+        padding: 24px 24px 20px;
+        background: #f7f8fa;
+        border: 1px solid #d8dde4;
+        box-shadow: 0 2px 10px rgba(26, 34, 44, 0.08);
+      }
+      .eyebrow {
+        width: 100%;
+        height: 4px;
+        border-radius: 999px;
+        margin-bottom: 12px;
+        background: ${accentHex};
+      }
+      h1 {
+        margin: 0;
+        font-size: 30px;
+        line-height: 1.12;
+        letter-spacing: -0.02em;
+        font-weight: 520;
+        color: #2f3a48;
+      }
+      p {
+        margin: 12px 0 0;
+        font-size: 16px;
+        line-height: 1.52;
+        color: rgba(47, 58, 72, 0.82);
+      }
+      @media (max-width: 640px) {
+        .card {
+          padding: 18px 16px;
+          border-radius: 10px;
+        }
+        h1 {
+          font-size: 26px;
+        }
+        p {
+          font-size: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card" role="main" aria-live="polite">
+      <div class="eyebrow" aria-hidden="true"></div>
+      <h1>${title}</h1>
+      <p>${message}</p>
+    </main>
+  </body>
+</html>`;
+  }
+
   state: OAuthSignInPageState = {
     authStage: 'initial',
     showAlternative: false,
@@ -73,7 +152,7 @@ export default class OAuthSignInPage extends React.Component<
       if (!this._mounted) {
         response.writeHead(410, { 'Content-Type': 'text/plain; charset=utf-8' });
         response.end(
-          'This authentication session has expired. Return to Mailspring and try again.'
+          'This authentication session has expired. Return to Courier and try again.'
         );
         return;
       }
@@ -92,13 +171,21 @@ export default class OAuthSignInPage extends React.Component<
         this._onError(new Error(errMessage));
         response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         response.end(
-          '<html><body><h3>Authentication was cancelled.</h3><p>You can close this tab and return to Mailspring.</p></body></html>'
+          this._renderAuthResultPage(
+            'Authentication was cancelled.',
+            'You can close this tab and return to Courier.',
+            '#d85f52'
+          )
         );
       } else if (code) {
         this._onReceivedCode(code);
         response.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         response.end(
-          '<html><body><h3>Authentication complete.</h3><p>You can close this tab and return to Mailspring.</p></body></html>'
+          this._renderAuthResultPage(
+            'Authentication complete.',
+            'You can close this tab and return to Courier.',
+            '#2b87f7'
+          )
         );
       } else {
         response.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -109,7 +196,7 @@ export default class OAuthSignInPage extends React.Component<
       AppEnv.showErrorDialog({
         title: localized('Unable to Start Local Server'),
         message: localized(
-          `To listen for the Gmail Oauth response, Mailspring needs to start a webserver on port ${LOCAL_SERVER_PORT}. Please go back and try linking your account again. If this error persists, use the IMAP/SMTP option with a Gmail App Password.\n\n%@`,
+          `To listen for the Gmail Oauth response, Courier needs to start a webserver on port ${LOCAL_SERVER_PORT}. Please go back and try linking your account again. If this error persists, use the IMAP/SMTP option with a Gmail App Password.\n\n%@`,
           err
         ),
       });
@@ -181,7 +268,7 @@ export default class OAuthSignInPage extends React.Component<
       return (
         <div>
           <h2>{localized('Successfully connected to %@!', this.props.serviceName)}</h2>
-          <h3>{localized('Adding your account to Mailspring…')}</h3>
+          <h3>{localized('Adding your account to Courier…')}</h3>
         </div>
       );
     }
@@ -237,7 +324,7 @@ export default class OAuthSignInPage extends React.Component<
 
   render() {
     return (
-      <div className={`page account-setup ${this.props.serviceName.toLowerCase()}`}>
+      <div className={`page account-setup oauth-signin ${this.props.serviceName.toLowerCase()}`}>
         <div className="logo-container">
           <RetinaImg
             name={this.props.providerConfig.headerIcon}
