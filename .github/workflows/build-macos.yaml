@@ -46,15 +46,11 @@ jobs:
 
       - name: Build DMG
         run: |
-<<<<<<< HEAD
           APP_PATH="app/dist/Courier-darwin-${{ matrix.arch }}/Courier.app"
           if [ ! -d "$APP_PATH" ]; then
             APP_PATH=$(find app/dist -maxdepth 3 -type d -name Courier.app | head -n 1)
           fi
 
-=======
-          APP_PATH="app/dist/Courier.app"
->>>>>>> 6910506227f2da2b2598d15fed83ea082b42773b
           if [ ! -d "$APP_PATH" ]; then
             echo "Missing app bundle at $APP_PATH"
             ls -la app/dist
