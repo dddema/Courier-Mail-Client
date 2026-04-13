@@ -3,10 +3,10 @@
 
 button,
 html input[type='button'] {
-  cursor: default;
+  cursor: pointer;
   &:hover,
   &:active {
-    cursor: default;
+    cursor: pointer;
   }
 }
 
@@ -53,7 +53,7 @@ body.platform-win32 {
   padding: 0 0.8em;
   border-radius: @border-radius-large;
   border: 0;
-  cursor: default;
+  cursor: pointer;
   display: inline-block;
   color: @btn-default-text-color;
   background: @btn-default-bg-color;
@@ -78,7 +78,7 @@ body.platform-win32 {
   }
 
   &:active {
-    cursor: default;
+    cursor: pointer;
     background: rgba(@text-color, 0.12);
   }
 
@@ -122,6 +122,7 @@ body.platform-win32 {
   &.btn-disabled {
     color: @text-color-very-subtle;
     background: rgba(@text-color, 0.04);
+    cursor: default;
     &:active {
       background: rgba(@text-color, 0.04);
     }
@@ -239,7 +240,7 @@ body.platform-win32 {
   }
 
   &:hover {
-    cursor: default;
+    cursor: pointer;
     color: @text-color-link;
     img.content-mask {
       background-color: @text-color-link;
