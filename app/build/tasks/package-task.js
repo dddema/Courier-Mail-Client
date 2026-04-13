@@ -120,7 +120,7 @@ module.exports = grunt => {
       platform: platform,
       protocols: [
         {
-          name: 'Mailspring Protocol',
+          name: 'Courier Protocol',
           schemes: ['mailspring'],
         },
         {
@@ -142,15 +142,15 @@ module.exports = grunt => {
           'build',
           'resources',
           'mac',
-          'mailspring.icns'
+          'Courier-Default.icns'
         ),
         win32: path.resolve(grunt.config('appDir'), 'build', 'resources', 'win', 'mailspring-square.ico'),
         linux: undefined,
       }[platform],
       name: {
-        darwin: 'Mailspring',
-        win32: 'Mailspring',
-        linux: 'mailspring',
+        darwin: 'Courier',
+        win32: 'Courier',
+        linux: 'courier',
       }[platform],
       appCopyright: `Copyright (C) 2014-${new Date().getFullYear()} Foundry 376, LLC. All rights reserved.`,
       derefSymlinks: false,
@@ -235,7 +235,7 @@ module.exports = grunt => {
               // cannot match to a profile scoped to that binary.
               // Note: electron-osx-sign passes the .app bundle path (not the
               // inner executable path) when signing the top-level app bundle.
-              const isMainExecutable = filePath.endsWith('/Mailspring.app');
+              const isMainExecutable = filePath.endsWith('/Courier.app');
 
               return {
                 hardenedRuntime: true,
@@ -260,9 +260,9 @@ module.exports = grunt => {
         : undefined,
       win32metadata: {
         CompanyName: 'Foundry 376, LLC',
-        FileDescription: 'Mailspring',
+        FileDescription: 'Courier',
         LegalCopyright: `Copyright (C) 2014-${new Date().getFullYear()} Foundry 376, LLC. All rights reserved.`,
-        ProductName: 'Mailspring',
+        ProductName: 'Courier',
       },
       // NOTE: The following plist keys can NOT be set in the
       // extra.plist since they are manually overridden by
@@ -279,7 +279,7 @@ module.exports = grunt => {
       // Electron.app/Contents/Info.plist. A majority of the defaults are
       // left in the Electron Info.plist file
       extendInfo: path.resolve(grunt.config('appDir'), 'build', 'resources', 'mac', 'extra.plist'),
-      appBundleId: 'com.mailspring.mailspring',
+      appBundleId: 'com.courier.courier',
       afterCopy: [
         runCopyPlatformSpecificResources,
         runWriteCommitHashIntoPackage,
@@ -290,7 +290,7 @@ module.exports = grunt => {
     },
   });
 
-  grunt.registerTask('package', 'Package Mailspring', function pack() {
+  grunt.registerTask('package', 'Package Courier', function pack() {
     const done = this.async();
     const start = Date.now();
 

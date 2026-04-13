@@ -7,7 +7,7 @@ module.exports = grunt => {
   const { spawn } = grunt.config('taskHelpers');
 
   const outputDir = grunt.config.get('outputDir');
-  const contentsDir = path.join(grunt.config('outputDir'), `mailspring-linux-${process.arch}`);
+  const contentsDir = path.join(grunt.config('outputDir'), `courier-linux-${process.arch}`);
   const linuxAssetsDir = path.resolve(path.join(grunt.config('buildDir'), 'resources', 'linux'));
   const arch = {
     ia32: 'i386',
@@ -50,22 +50,25 @@ module.exports = grunt => {
       version: grunt.config('appJSON').version,
       description: grunt.config('appJSON').description,
       productName: grunt.config('appJSON').productName,
-      linuxShareDir: '/usr/local/share/mailspring',
+      linuxShareDir: '/usr/local/share/courier',
       linuxAssetsDir: linuxAssetsDir,
       contentsDir: contentsDir,
     };
 
-    // This populates mailspring.spec
+    // This populates courier.spec
     const specInFilePath = path.join(linuxAssetsDir, 'redhat', 'mailspring.spec.in');
-    writeFromTemplate(specInFilePath, templateData);
+    const generatedSpec = writeFromTemplate(specInFilePath, templateData);
+    grunt.file.copy(generatedSpec, path.join(outputDir, 'courier.spec'));
 
-    // This populates Mailspring.desktop
+    // This populates Courier.desktop
     const desktopInFilePath = path.join(linuxAssetsDir, 'Mailspring.desktop.in');
-    writeFromTemplate(desktopInFilePath, templateData);
+    const generatedDesktop = writeFromTemplate(desktopInFilePath, templateData);
+    grunt.file.copy(generatedDesktop, path.join(outputDir, 'Courier.desktop'));
 
-    // This populates mailspring.appdata.xml
+    // This populates courier.appdata.xml
     const appdataInFilePath = path.join(linuxAssetsDir, 'mailspring.appdata.xml.in');
-    writeFromTemplate(appdataInFilePath, templateData);
+    const generatedAppData = writeFromTemplate(appdataInFilePath, templateData);
+    grunt.file.copy(generatedAppData, path.join(outputDir, 'courier.appdata.xml'));
 
     const cmd = path.join(grunt.config('appDir'), 'script', 'mkrpm');
     const args = [outputDir, contentsDir, linuxAssetsDir];
@@ -97,15 +100,20 @@ module.exports = grunt => {
         name: grunt.config('appJSON').name,
         description: grunt.config('appJSON').description,
         productName: grunt.config('appJSON').productName,
-        linuxShareDir: '/usr/share/mailspring',
+        linuxShareDir: '/usr/share/courier',
         arch: arch,
         section: 'mail',
-        maintainer: 'Mailspring Team <support@getmailspring.com>',
+        maintainer: 'Courier Team <support@getmailspring.com>',
         installedSize: installedSize,
       };
       writeFromTemplate(path.join(linuxAssetsDir, 'debian', 'control.in'), data);
-      writeFromTemplate(path.join(linuxAssetsDir, 'Mailspring.desktop.in'), data);
-      writeFromTemplate(path.join(linuxAssetsDir, 'mailspring.appdata.xml.in'), data);
+      const generatedDesktop = writeFromTemplate(path.join(linuxAssetsDir, 'Mailspring.desktop.in'), data);
+      const generatedAppData = writeFromTemplate(
+        path.join(linuxAssetsDir, 'mailspring.appdata.xml.in'),
+        data
+      );
+      grunt.file.copy(generatedDesktop, path.join(outputDir, 'Courier.desktop'));
+      grunt.file.copy(generatedAppData, path.join(outputDir, 'courier.appdata.xml'));
 
       const icon = path.join(
         grunt.config('appDir'),
@@ -121,7 +129,7 @@ module.exports = grunt => {
         if (spawnError) {
           return done(spawnError);
         }
-        grunt.log.ok(`Created ${outputDir}/mailspring-${version}-${arch}.deb`);
+        grunt.log.ok(`Created ${outputDir}/courier-${version}-${arch}.deb`);
         return done();
       });
     });
