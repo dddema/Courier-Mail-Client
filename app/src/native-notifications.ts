@@ -13,7 +13,7 @@ const DEFAULT_ICON = path.resolve(
   AppEnv.getLoadSettings().resourcePath,
   'static',
   'images',
-  'mailspring.png'
+  'Courier-Icon-Default.png'
 );
 
 type INotificationCallback = (args: {
