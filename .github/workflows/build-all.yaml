@@ -1,0 +1,153 @@
+name: Build All Platforms
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system deps
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            software-properties-common \
+            autoconf automake build-essential clang cmake execstack fakeroot git \
+            libc-ares-dev libctemplate-dev libcurl4-openssl-dev libglib2.0-dev \
+            libicu-dev libsasl2-dev libsasl2-modules libsasl2-modules-gssapi-mit \
+            libsecret-1-dev libssl-dev libnss3 libnss3-dev libtidy-dev libtool \
+            libxext-dev libxkbfile-dev libxml2-dev libxtst-dev pkg-config rpm \
+            uuid-dev xvfb
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: DEBUG=electron-packager npm run build
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: courier-linux-x64
+          path: |
+            app/dist/*.deb
+            app/dist/*.rpm
+          retention-days: 7
+
+  build-macos:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            arch: arm64
+          - os: macos-15-intel
+            arch: x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache NodeJS modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./node_modules
+            ./app/node_modules
+          key: ${{ matrix.os }}-${{ runner.arch }}-deps-${{ hashFiles('yarn.lock') }}-${{ hashFiles('app/package-lock.json') }}
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: DEBUG=electron-packager npm run build
+
+      - name: Build DMG
+        run: |
+          APP_PATH="app/dist/Courier-darwin-${{ matrix.arch }}/Courier.app"
+          if [ ! -d "$APP_PATH" ]; then
+            APP_PATH=$(find app/dist -maxdepth 3 -type d -name Courier.app | head -n 1)
+          fi
+
+          if [ ! -d "$APP_PATH" ]; then
+            echo "Missing app bundle at $APP_PATH"
+            ls -la app/dist
+            exit 1
+          fi
+
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            DMG_NAME="Courier-AppleSilicon.dmg"
+          else
+            DMG_NAME="Courier-Intel.dmg"
+          fi
+
+          hdiutil create -volname "Courier" -srcfolder "$APP_PATH" -ov -format UDZO "app/dist/$DMG_NAME"
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: courier-macos-${{ matrix.arch }}
+          path: app/dist/*.dmg
+          retention-days: 7
+
+  build-windows:
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache NodeJS modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./node_modules
+            ./app/node_modules
+          key: windows-2022-deps-${{ hashFiles('package-lock.json') }}-${{ hashFiles('app/package-lock.json') }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          DEBUG: electron-packager
+
+      - name: Create Windows Installer
+        run: node app/build/create-signed-windows-installer.js
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: courier-windows-x64
+          path: |
+            app/dist/CourierSetup.exe
+            app/dist/*.nupkg
+            app/dist/RELEASES
+          if-no-files-found: warn
+          retention-days: 7
