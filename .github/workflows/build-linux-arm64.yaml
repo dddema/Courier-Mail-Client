@@ -35,11 +35,26 @@ jobs:
         run: npm ci
         working-directory: .
 
+      - name: Setup AWS CLI
+        if: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
       - name: Lint
         run: npm run lint
 
       - name: Build
         run: DEBUG=electron-packager npm run build
+
+      - name: Sync Artifacts to S3
+        if: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}
+        run: |
+          aws s3 sync app/dist/ "s3://mailspring-builds/client/$(git rev-parse --short=8 HEAD)/linux-arm64" \
+            --acl public-read \
+            --exclude "*" --include "*.deb" --include "*.rpm"
 
       - name: Upload DEB artifact for testing
         uses: actions/upload-artifact@v4
@@ -54,6 +69,29 @@ jobs:
           name: courier-arm64-rpm
           path: app/dist/*.rpm
           retention-days: 1
+
+  build-snap:
+    if: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS != '' }}
+    needs: build
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download DEB artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: courier-arm64-deb
+          path: app/dist/
+
+      - uses: snapcore/action-build@v1
+        id: build-snap
+
+      - uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        with:
+          snap: ${{ steps.build-snap.outputs.snap }}
+          release: edge
 
   test-ubuntu:
     needs: build
