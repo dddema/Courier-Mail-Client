@@ -100,7 +100,43 @@ export class MailsyncProcess extends EventEmitter {
     this.verbose = verbose;
     this.resourcePath = resourcePath;
     this.configDirPath = configDirPath;
-    this.binaryPath = path.join(resourcePath, 'mailsync').replace('app.asar', 'app.asar.unpacked');
+    const candidateBinaryPaths = ['mailsync', 'mailsync.bin', 'mailsync.exe'].map(name =>
+      path.join(resourcePath, name).replace('app.asar', 'app.asar.unpacked')
+    );
+    const sourceBinaryPath = candidateBinaryPaths.find(p => fs.existsSync(p)) || candidateBinaryPaths[0];
+    this.binaryPath = this._resolveBinaryPath(sourceBinaryPath);
+  }
+
+  _resolveBinaryPath(sourceBinaryPath: string) {
+    // Some release mailsync builds enforce that the executable path contains
+    // "mailspring". Keep the binary unchanged and execute a copied binary from
+    // a mailspring-named path inside CONFIG_DIR_PATH.
+    if (sourceBinaryPath.toLowerCase().includes('mailspring')) {
+      return sourceBinaryPath;
+    }
+
+    const targetDir = path.join(this.configDirPath, 'mailspring-bin');
+    const targetBinaryPath = path.join(targetDir, path.basename(sourceBinaryPath));
+
+    try {
+      fs.mkdirSync(targetDir, { recursive: true });
+
+      const needsCopy =
+        !fs.existsSync(targetBinaryPath) ||
+        fs.statSync(targetBinaryPath).size !== fs.statSync(sourceBinaryPath).size;
+
+      if (needsCopy) {
+        fs.copyFileSync(sourceBinaryPath, targetBinaryPath);
+        if (process.platform !== 'win32') {
+          fs.chmodSync(targetBinaryPath, 0o755);
+        }
+      }
+
+      return targetBinaryPath;
+    } catch (err) {
+      console.warn('Failed to stage mailsync binary in mailspring path:', err);
+      return sourceBinaryPath;
+    }
   }
 
   _showStatusWindow(mode) {
