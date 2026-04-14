@@ -6,7 +6,7 @@ import _ from 'underscore';
 
 import { Task } from './tasks/task';
 import TaskQueue from './stores/task-queue';
-import { IdentityStore } from './stores/identity-store';
+import { IdentityStore, IIdentity } from './stores/identity-store';
 
 import { Account } from './models/account';
 import { AccountStore } from './stores/account-store';
@@ -296,7 +296,7 @@ export default class MailsyncBridge {
   }
 
   _identityForClient() {
-    const identity = IdentityStore.identity() || {};
+    const identity = (IdentityStore.identity() || {}) as Partial<IIdentity>;
     const createdAt =
       typeof identity.createdAt === 'string' && identity.createdAt.length > 0
         ? identity.createdAt

@@ -107,6 +107,8 @@ export class Account extends ModelWithMetadata {
     smtp_security: 'SSL / TLS' | 'STARTTLS' | 'none';
     refresh_token: string;
     container_folder: string;
+    cloudToken?: string;
+    mailspringIdToken?: string;
   };
   public label: string;
   public autoaddress: AccountAutoaddress;
